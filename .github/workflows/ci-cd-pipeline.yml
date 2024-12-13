@@ -1,0 +1,91 @@
+name: CI/CD Pipeline
+
+# Trigger the workflow on push or pull_request to the 'test' branch
+on:
+  push:
+    branches:
+      - production
+  pull_request:
+
+# Set environment variables
+env:
+  DOCKER_REGISTRY: docker.io
+  DOCKER_IMAGE: kai1409/jobtrackerapp
+  DOCKER_TAG: latest
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the code
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      # Step 2: Set up the .NET SDK
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 8.0
+
+      # Step 3: Restore dependencies
+      - name: Restore Dependencies
+        run: dotnet restore
+
+      # Step 4: Build Docker images for each service
+      - name: Build Docker Image for UserService
+        run: docker build -t $DOCKER_IMAGE:user-service -f UserService/Dockerfile ./UserService
+
+      - name: Build Docker Image for JobService
+        run: docker build -t $DOCKER_IMAGE:job-service -f JobService/Dockerfile ./JobService
+
+      - name: Build Docker Image for NotificationService
+        run: docker build -t $DOCKER_IMAGE:notification-service -f NotificationService/Dockerfile ./NotificationService
+
+      # Step 5: Push Docker images to Docker Hub
+      - name: Push Docker Image for UserService
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: |
+          echo $DOCKER_PASSWORD | docker login -u "$DOCKER_USERNAME" --password-stdin
+          docker tag $DOCKER_IMAGE:user-service $DOCKER_REGISTRY/$DOCKER_IMAGE:user-service
+          docker push $DOCKER_REGISTRY/$DOCKER_IMAGE:user-service
+
+      - name: Push Docker Image for JobService
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: |
+          echo $DOCKER_PASSWORD | docker login -u "$DOCKER_USERNAME" --password-stdin
+          docker tag $DOCKER_IMAGE:job-service $DOCKER_REGISTRY/$DOCKER_IMAGE:job-service
+          docker push $DOCKER_REGISTRY/$DOCKER_IMAGE:job-service
+
+      - name: Push Docker Image for NotificationService
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: |
+          echo $DOCKER_PASSWORD | docker login -u "$DOCKER_USERNAME" --password-stdin
+          docker tag $DOCKER_IMAGE:notification-service $DOCKER_REGISTRY/$DOCKER_IMAGE:notification-service
+          docker push $DOCKER_REGISTRY/$DOCKER_IMAGE:notification-service
+
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Install Docker Compose
+      - name: Install Docker Compose
+        run: |
+          sudo curl -L "https://github.com/docker/compose/releases/download/v2.20.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
+          docker-compose --version
+
+      # Step 2: Checkout the code
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      # Step 3: Deploy Docker Compose
+      - name: Deploy with Docker Compose
+        run: |
+          docker-compose -f docker-compose.yml up -d

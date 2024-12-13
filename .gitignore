@@ -1,0 +1,27 @@
+# Ignore Visual Studio files
+.vs/
+bin/
+obj/
+*.user
+*.suo
+*.tmp
+*.bak
+
+# Ignore .NET build artifacts
+*.dll
+*.exe
+*.pdb
+*.cache
+*.debug
+
+# Ignore Docker files
+docker-compose.override.yml
+
+# User secrets and environment variables
+appsettings.Development.json
+secrets.json
+
+# Exclude logs and temp directories
+logs/
+*.log
+temp/
