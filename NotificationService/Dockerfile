@@ -1,5 +1,5 @@
-# Use SDK to build the application
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+# Build the application
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /app
 
 # Copy everything into the build container
@@ -8,24 +8,25 @@ COPY . .
 # Publish the application
 RUN dotnet publish -c Release -o out
 
-# Use ASP.NET runtime to run the application
-FROM mcr.microsoft.com/dotnet/aspnet:8.0
+# Run the application using the ASP.NET runtime
+FROM mcr.microsoft.com/dotnet/aspnet:9.0
 WORKDIR /app
 
-# Copy published output and Kafka wait script
+# Copy the published output and the Kafka wait script
 COPY --from=build /app/out . 
 COPY wait-for-kafka.sh /app/wait-for-kafka.sh
 
-# Install netcat for checking Kafka availability
+# Install netcat to check Kafka availability
 RUN apt-get update && \
     apt-get install -y netcat-openbsd && \
     rm -rf /var/lib/apt/lists/*
 
 # Ensure the Kafka wait script is executable
-RUN chmod +x /app/wait-for-kafka.sh
+RUN chmod +x /app/wait-for-kafka.sh && \
+    echo "Kafka wait script copied and permissions fixed"
 
-# Expose port for NotificationService
+# Expose port 5001 for NotificationService
 EXPOSE 5001
 
-# Use the wait script as entry point
+# Use the wait script as an entry point
 ENTRYPOINT ["/app/wait-for-kafka.sh"]
