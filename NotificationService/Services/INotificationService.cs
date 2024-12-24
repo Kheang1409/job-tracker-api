@@ -2,7 +2,8 @@ using NotificationService.Models;
 
 public interface INotificationService
 {
-    Task SendReminderEmail(ReminderNotification reminder);
     Task SendStatusUpdateEmail(StatusUpdateNotification statusUpdate);
-    Task SendResetPasswordEmail(string email, string resetLink);
+    Task SendResetPasswordEmail(ResetPasswordNotification resetPassword);
+    Task SendReminderEmail(ReminderNotification reminder);
+    Task SendGoodLuckEmail(GoodLuckNotification goodLuck);
 }

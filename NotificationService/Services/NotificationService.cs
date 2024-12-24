@@ -22,10 +22,12 @@ namespace NotificationService.Services
         {
             try
             {
-                // Construct the email body with the reset link
-                var emailBody = $"Please reset your password using this link: {reminder.ResetLink}";
+                // Construct the email body with the reminder message and optional scheduled date
+                var emailBody = reminder.ScheduledDate != null
+                    ? $"Reminder: {reminder.Message}\n\nScheduled Date: {reminder.ScheduledDate:MMMM dd, yyyy HH:mm}"
+                    : $"Reminder: {reminder.Message}";
 
-                var message = CreateEmailMessage(reminder.Email, "JobTrackerApp - Password Reset", emailBody);
+                var message = CreateEmailMessage(reminder.Email, "JobTrackerApp - Reminder Notification", emailBody);
 
                 await SendEmailAsync(message);
                 Console.WriteLine($"Reminder email sent to {reminder.Email}");
@@ -33,6 +35,28 @@ namespace NotificationService.Services
             catch (Exception ex)
             {
                 Console.WriteLine($"Failed to send reminder email: {ex.Message}");
+            }
+        }
+
+        public async Task SendGoodLuckEmail(GoodLuckNotification goodLuck)
+        {
+            try
+            {
+                // Construct the email body
+                var emailBody = $"Hello,\n\nGood luck with your interview! " +
+                                $"We hope you have a great experience. If you have any questions or need support, feel free to reach out.\n\n" +
+                                "Best regards,\nJobTrackerApp Team";
+
+                // Create the email message
+                var message = CreateEmailMessage(goodLuck.Email, "Good Luck with Your Interview!", emailBody);
+
+                // Send the email
+                await SendEmailAsync(message);
+                Console.WriteLine($"Good luck email sent to {goodLuck.Email}.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to send good luck email: {ex.Message}");
             }
         }
 
@@ -55,18 +79,18 @@ namespace NotificationService.Services
             }
         }
 
-        public async Task SendResetPasswordEmail(string email, string resetLink)
+        public async Task SendResetPasswordEmail(ResetPasswordNotification resetPassword)
         {
             try
             {
                 var message = CreateEmailMessage(
-                    email,
+                    resetPassword.Email,
                     "Reset Your Password",
-                    $"Click this link to reset your password: {resetLink}"
+                    $"Click this link to reset your password: {resetPassword.ResetLink}"
                 );
 
                 await SendEmailAsync(message);
-                Console.WriteLine($"Reset password email sent to {email}");
+                Console.WriteLine($"Reset password email sent to {resetPassword.Email}");
             }
             catch (Exception ex)
             {
@@ -91,11 +115,6 @@ namespace NotificationService.Services
             try
             {
                 using var client = new SmtpClient();
-                Console.WriteLine($"_emailSettings.SmtpServer {_emailSettings.SmtpServer}");
-                Console.WriteLine($"_emailSettings.Port {_emailSettings.Port}");
-                Console.WriteLine($"_emailSettings.SenderEmail {_emailSettings.SenderEmail}");
-                Console.WriteLine($"_emailSettings.SenderPassword {_emailSettings.SenderPassword}");
-
                 await client.ConnectAsync(_emailSettings.SmtpServer, _emailSettings.Port, SecureSocketOptions.SslOnConnect);
                 await client.AuthenticateAsync(_emailSettings.SenderEmail, _emailSettings.SenderPassword);
                 await client.SendAsync(message);

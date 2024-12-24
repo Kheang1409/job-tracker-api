@@ -1,5 +1,6 @@
 using System.Text;
 using JobService.AutoMapper;
+using JobService.Kafka;
 using JobService.Repositories;
 using JobService.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -42,6 +43,9 @@ builder.Services.AddSwaggerGen(options =>
 // MongoDB Configuration - Prefer environment variables over appsettings.json
 string mongoConnectionString = Environment.GetEnvironmentVariable("MongoDB__ConnectionString")
                                ?? builder.Configuration.GetConnectionString("MongoDB");
+
+
+builder.Services.AddSingleton<IKafkaProducer, KafkaProducer>();
 
 // MongoDB Configuration
 builder.Services.AddSingleton<IMongoClient>(_ => new MongoClient(mongoConnectionString));

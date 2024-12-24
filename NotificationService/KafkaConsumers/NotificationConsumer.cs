@@ -1,8 +1,7 @@
 using Confluent.Kafka;
+using Hangfire;
 using Newtonsoft.Json;
 using NotificationService.Models;
-using NotificationService.Services;
-using Microsoft.Extensions.Hosting;
 using System.Text.RegularExpressions;
 
 namespace NotificationService.KafkaConsumers;
@@ -38,18 +37,31 @@ public class NotificationConsumer : BackgroundService
                     {
                         var payload = JsonConvert.DeserializeObject<dynamic>(message.Value);
 
-                        // Validate the message type and required fields
-                        if (payload?.Type == "resetPassword" && IsValidEmail(payload?.Email?.ToString()))
+                        // Check the notification type and route to appropriate handler
+                        string type = payload?.Type?.ToString();
+                        switch (type)
                         {
-                            var email = payload?.Email.ToString();
-                            var resetLink = payload?.ResetLink.ToString();
+                            case "resetPassword":
+                                await HandleResetPassword(payload);
+                                break;
 
-                            await SendEmailNotification(email, resetLink);
+                            case "statusUpdate":
+                                await HandleStatusUpdate(payload);
+                                break;
+
+                            case "reminder":
+                                await HandleReminder(payload);
+                                break;
+
+                            case "goodLuck":
+                                await HandleGoodLuck(payload);
+                                break;
+
+                            default:
+                                Console.WriteLine($"Unknown notification type: {type}. Skipping...");
+                                break;
                         }
-                        else
-                        {
-                            Console.WriteLine("Invalid message payload or missing fields. Skipping...");
-                        }
+
                     }
                     catch (JsonException ex)
                     {
@@ -80,27 +92,118 @@ public class NotificationConsumer : BackgroundService
         Console.WriteLine("Kafka consumer stopped.");
     }
 
-    private async Task SendEmailNotification(string email, string resetLink)
+    // Handler for Reset Password Notification (Existing Logic)
+    private async Task HandleResetPassword(dynamic payload)
     {
-        var reminder = new ReminderNotification
+        if (payload?.Email == null || payload?.ResetLink == null || !IsValidEmail(payload?.Email.ToString()))
         {
+            Console.WriteLine("Invalid ResetPassword payload. Skipping...");
+            return;
+        }
+
+        string email = payload.Email.ToString();
+        string resetLink = payload.ResetLink.ToString();
+
+        var notification = new ResetPasswordNotification
+        {
+            Type = "resetPassword",
             Email = email,
             Message = "Please reset your password.",
             ResetLink = resetLink
         };
 
-        try
+        await SendNotification(notification, async () =>
+            await _notificationService.SendResetPasswordEmail(notification));
+    }
+
+    // Handler for Status Update Notification
+    private async Task HandleStatusUpdate(dynamic payload)
+    {
+        if (payload?.Email == null || payload?.JobTitle == null || payload?.Status == null ||
+            !IsValidEmail(payload?.Email.ToString()))
         {
-            Console.WriteLine($"Sending email notification to {email}...");
-            await _notificationService.SendReminderEmail(reminder);
-            Console.WriteLine($"Email notification successfully sent to {email}");
+            Console.WriteLine("Invalid StatusUpdate payload. Skipping...");
+            return;
         }
-        catch (Exception e)
+
+        var notification = new StatusUpdateNotification
         {
-            Console.WriteLine($"Email Notification Failed: {e.Message}");
+            Type = "statusUpdate",
+            Email = payload.Email.ToString(),
+            JobTitle = payload.JobTitle.ToString(),
+            Status = payload.Status.ToString()
+        };
+
+        await SendNotification(notification, async () =>
+            await _notificationService.SendStatusUpdateEmail(notification));
+    }
+
+    // Handler for Reminder Notification
+    private async Task HandleReminder(dynamic payload)
+    {
+        if (payload?.Email == null || payload?.Message == null || payload?.ScheduledDate == null ||
+            !IsValidEmail(payload?.Email.ToString()))
+        {
+            Console.WriteLine($"Check: {payload?.Email}, {payload?.Message}, {payload?.ScheduledDate}");
+            Console.WriteLine("Invalid Reminder payload. Skipping...");
+            return;
+        }
+
+        var notification = new ReminderNotification
+        {
+            Type = "reminder",
+            Email = payload.Email.ToString(),
+            Message = payload.Message.ToString(),
+            ScheduledDate = DateTime.Parse(payload.ScheduledDate.ToString())
+        };
+
+        var timeUntilSend = notification.ScheduledDate - DateTime.UtcNow;
+
+        if (timeUntilSend <= TimeSpan.Zero)
+        {
+            await SendNotification(notification, async () =>
+                await _notificationService.SendReminderEmail(notification));
+        }
+        else
+        {
+            BackgroundJob.Schedule(() =>
+                _notificationService.SendReminderEmail(notification), timeUntilSend);
         }
     }
 
+    // Handler for Good Luck Notification
+    private async Task HandleGoodLuck(dynamic payload)
+    {
+        if (payload?.Email == null || payload?.Message == null || !IsValidEmail(payload?.Email.ToString()))
+        {
+            Console.WriteLine($"Check: {payload?.Email}, {payload?.Message}, {payload?.ScheduledDate}");
+            Console.WriteLine("Invalid GoodLuck payload. Skipping...");
+            return;
+        }
+
+        var notification = new GoodLuckNotification
+        {
+            Type = "goodLuck",
+            Email = payload.Email.ToString(),
+            Message = payload.Message.ToString(),
+            ScheduledDate = DateTime.Parse(payload.ScheduledDate.ToString())
+        };
+
+        var timeUntilSend = notification.ScheduledDate - DateTime.UtcNow;
+
+        if (timeUntilSend <= TimeSpan.Zero)
+        {
+            await SendNotification(notification, async () =>
+                await _notificationService.SendGoodLuckEmail(notification));
+        }
+        else
+        {
+            BackgroundJob.Schedule(() =>
+                _notificationService.SendGoodLuckEmail(notification), timeUntilSend);
+        }
+    }
+
+    // Helper to validate email format
     private static bool IsValidEmail(string email)
     {
         if (string.IsNullOrWhiteSpace(email)) return false;
@@ -114,6 +217,21 @@ public class NotificationConsumer : BackgroundService
         catch
         {
             return false;
+        }
+    }
+
+    // Helper to send notifications and handle errors
+    private async Task SendNotification<T>(T notification, Func<Task> sendEmailFunc) where T : NotificationBase
+    {
+        try
+        {
+            Console.WriteLine($"Sending {notification.Type} notification to {notification.Email}...");
+            await sendEmailFunc();
+            Console.WriteLine($"{notification.Type} notification successfully sent to {notification.Email}.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Failed to send {notification.Type} notification: {ex.Message}");
         }
     }
 

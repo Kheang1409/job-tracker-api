@@ -25,8 +25,6 @@ RUN apt-get update && \
 RUN chmod +x /app/wait-for-kafka.sh && \
     echo "Kafka wait script copied and permissions fixed"
 
-# Expose port 5001 for NotificationService
 EXPOSE 5001
 
-# Use the wait script as an entry point
 ENTRYPOINT ["/app/wait-for-kafka.sh"]

@@ -96,11 +96,13 @@ namespace JobService.Controllers
         {
             try
             {
-                var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
 
-                if (string.IsNullOrEmpty(userId))
+
+                if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(userEmail))
                 {
-                    return Unauthorized("User ID not found in token.");
+                    return Unauthorized("User ID or Email not found in token.");
                 }
 
                 var job = await _jobService.GetJobByIdAsync(jobId, userId);
@@ -109,7 +111,7 @@ namespace JobService.Controllers
                     return NotFound("Job not found or unauthorized access.");
                 }
 
-                await _jobService.SetInterviewReminderAsync(jobId, reminderDto, userId);
+                await _jobService.SetInterviewReminderAsync(jobId, reminderDto, userEmail);
 
                 return Ok("Interview reminder has been set successfully.");
             }
