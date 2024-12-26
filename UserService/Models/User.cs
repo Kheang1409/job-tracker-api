@@ -8,9 +8,10 @@ namespace UserService.Models
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; } = ObjectId.GenerateNewId().ToString();
+        public string Username { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public string PasswordHash { get; set; } = string.Empty;
-        public string ResetToken { get; set; } = string.Empty; // For password reset
-        public DateTime? ResetTokenExpiry { get; set; } // Expiry for reset token
+        public string OPT { get; set; } = string.Empty;
+        public DateTime? OPTExpiry { get; set; }
     }
 }

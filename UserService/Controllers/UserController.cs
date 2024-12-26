@@ -25,7 +25,7 @@ namespace UserService.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register(RegisterUserDto dto)
+        public async Task<IActionResult> Register(RegisterDto dto)
         {
             if (await _userRepository.GetByEmailAsync(dto.Email) != null)
             {
@@ -34,6 +34,7 @@ namespace UserService.Controllers
 
             var user = new User
             {
+                Username = dto.Username,
                 Email = dto.Email,
                 PasswordHash = HashPassword(dto.Password)
             };
@@ -50,45 +51,43 @@ namespace UserService.Controllers
             if (user == null)
                 return BadRequest("Email not registered.");
 
-            var resetToken = GenerateResetToken();
-            var expiry = DateTime.UtcNow.AddMinutes(60);
-
-            await _userRepository.UpdateResetTokenAsync(email, resetToken, expiry);
-
-            var baseUrl = "https://improved-palm-tree-j46j575qpj6cvj6-5000.app.github.dev";
-            var resetLink = $"{baseUrl}/api/user/reset-password/{resetToken}";
+            var otp = GenerateOtp();
+            var expiry = DateTime.UtcNow.AddMinutes(3);
+            await _userRepository.UpdateOPTAsync(email, otp, expiry);
 
             var notificationPayload = new
             {
                 Type = "resetPassword",
                 Email = email,
-                ResetLink = resetLink
+                Otp = otp
             };
 
             _kafkaProducer.Produce("job-topic", Guid.NewGuid().ToString(), notificationPayload);
 
-            return Ok("Reset link has been sent to your email.");
+            return Ok("OTP has been sent to your email.");
         }
 
 
 
-        [HttpPost("reset-password/{token}")]
-        public async Task<IActionResult> ResetPassword(string token, ResetPasswordDto dto)
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword(ResetPasswordDto dto)
         {
-            var user = await _userRepository.GetByResetTokenAsync(token);
+            var user = await _userRepository.GetByOPTAsync(dto.Otp);
             if (user == null)
-                return BadRequest("Invalid or expired reset token.");
+                return BadRequest("Invalid or expired OTP.");
 
+            // Update password
             user.PasswordHash = HashPassword(dto.NewPassword);
-            user.ResetToken = string.Empty;
-            user.ResetTokenExpiry = null;
+            user.OPT = string.Empty;
+            user.OPTExpiry = null;
 
             await _userRepository.UpdateUserAsync(user);
+
             return Ok("Password reset successfully.");
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] RegisterUserDto dto)
+        public async Task<IActionResult> Login([FromBody] LoginDto dto)
         {
             var user = await _userRepository.GetByEmailAsync(dto.Email);
             if (user == null || !VerifyPassword(dto.Password, user.PasswordHash))
@@ -100,12 +99,18 @@ namespace UserService.Controllers
             return Ok(new { Token = token });
         }
 
-        private static string GenerateResetToken()
+        // private static string GenerateResetToken()
+        // {
+        //     using var rng = RandomNumberGenerator.Create();
+        //     var bytes = new byte[32];
+        //     rng.GetBytes(bytes);
+        //     return Convert.ToBase64String(bytes);
+        // }
+
+        private static string GenerateOtp()
         {
-            using var rng = RandomNumberGenerator.Create();
-            var bytes = new byte[32];
-            rng.GetBytes(bytes);
-            return Convert.ToBase64String(bytes);
+            var random = new Random();
+            return random.Next(100000, 999999).ToString();
         }
 
         private static string HashPassword(string password)

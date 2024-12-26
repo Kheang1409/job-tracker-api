@@ -86,7 +86,7 @@ namespace NotificationService.Services
                 var message = CreateEmailMessage(
                     resetPassword.Email,
                     "Reset Your Password",
-                    $"Click this link to reset your password: {resetPassword.ResetLink}"
+                    $"Use this OPT reset your password: {resetPassword.OTP}"
                 );
 
                 await SendEmailAsync(message);

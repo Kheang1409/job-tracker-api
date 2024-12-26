@@ -95,21 +95,21 @@ public class NotificationConsumer : BackgroundService
     // Handler for Reset Password Notification (Existing Logic)
     private async Task HandleResetPassword(dynamic payload)
     {
-        if (payload?.Email == null || payload?.ResetLink == null || !IsValidEmail(payload?.Email.ToString()))
+        if (payload?.Email == null || payload?.Otp == null || !IsValidEmail(payload?.Email.ToString()))
         {
             Console.WriteLine("Invalid ResetPassword payload. Skipping...");
             return;
         }
 
         string email = payload.Email.ToString();
-        string resetLink = payload.ResetLink.ToString();
+        string Otp = payload.Otp.ToString();
 
         var notification = new ResetPasswordNotification
         {
             Type = "resetPassword",
             Email = email,
             Message = "Please reset your password.",
-            ResetLink = resetLink
+            OTP = Otp
         };
 
         await SendNotification(notification, async () =>
