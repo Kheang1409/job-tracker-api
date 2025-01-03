@@ -33,7 +33,10 @@ public class JobService : IJobService
             Id = job.Id,
             UserId = job.UserId,
             Title = job.Title,
+            Skills = job.Skills,
+            Description = job.Description,
             Company = job.Company,
+            Location = job.Location,
             AppliedDate = job.AppliedDate,
             Status = job.Status,
             InterviewDate = job.InterviewDate,
@@ -51,9 +54,37 @@ public class JobService : IJobService
     {
         var job = _mapper.Map<Job>(createJobDto);
         job.UserId = userId;
-        job.Status = "Applied";
+        job.Status = createJobDto.Status;
+        job.AppliedDate = createJobDto.AppliedDate;
         await _jobRepository.CreateJobAsync(job);
         return _mapper.Map<Job>(job);
+    }
+
+
+
+    public async Task<JobDto?> UpdateJobAsync(string jobId, UpdateJobDto updateDto, string userId)
+    {
+        var job = await _jobRepository.GetJobByIdAsync(jobId);
+
+        if (job == null || job.UserId != userId)
+        {
+            return null;
+        }
+
+        job.Title = updateDto.Title != null ? updateDto.Title : job.Title;
+        job.Skills = updateDto.Skills != null ? updateDto.Skills : job.Skills;
+        job.Description = updateDto.Description != null ? updateDto.Description : job.Description;
+        job.Location = updateDto.Location != null ? updateDto.Location : job.Location;
+        job.AppliedDate = updateDto.AppliedDate != null ? updateDto.AppliedDate : job.AppliedDate;
+        job.Status = updateDto.Status != null ? updateDto.Status : job.Status;
+        job.InterviewDate = updateDto.InterviewDate != null ? updateDto.InterviewDate : job.InterviewDate;
+        job.ReminderDaysBeforeInterview = updateDto.ReminderDaysBeforeInterview != null ? updateDto.ReminderDaysBeforeInterview : job.ReminderDaysBeforeInterview;
+
+        await _jobRepository.UpdateJobAsync(job);
+
+        return _mapper.Map<JobDto>(job);
+
+        throw new ArgumentException("Invalid job status.");
     }
 
     public async Task<JobDto?> UpdateJobStatusAsync(string jobId, UpdateJobStatusDto updateStatusDto, string userId)

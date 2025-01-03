@@ -91,7 +91,7 @@ namespace JobService.Controllers
             return Ok(updatedJob);
         }
 
-        [HttpPut("{jobId}/reminder")]
+        [HttpPatch("{jobId}/reminder")]
         public async Task<IActionResult> SetInterviewReminder(string jobId, [FromBody] SetInterviewReminderDto reminderDto)
         {
             try
@@ -119,6 +119,19 @@ namespace JobService.Controllers
             {
                 return BadRequest($"Failed to set interview reminder: {ex.Message}");
             }
+        }
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateJob(string id, [FromBody] UpdateJobDto updateJob)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (userId == null)
+            {
+                return Unauthorized("User ID not found in token.");
+            }
+
+            var job = await _jobService.UpdateJobAsync(id, updateJob, userId);
+            return Ok(job);
         }
 
 
