@@ -55,7 +55,8 @@ public class JobService : IJobService
         var job = _mapper.Map<Job>(createJobDto);
         job.UserId = userId;
         job.Status = createJobDto.Status;
-        job.AppliedDate = createJobDto.AppliedDate;
+        if (job.Status == "Applied")
+            job.AppliedDate = DateTime.UtcNow;
         await _jobRepository.CreateJobAsync(job);
         return _mapper.Map<Job>(job);
     }
@@ -97,6 +98,8 @@ public class JobService : IJobService
         }
 
         job.Status = updateStatusDto.Status;
+        if (job.Status == "Applied" && job.AppliedDate == null)
+            job.AppliedDate = DateTime.UtcNow;
         await _jobRepository.UpdateJobAsync(job);
 
         return _mapper.Map<JobDto>(job);
@@ -113,14 +116,14 @@ public class JobService : IJobService
             return false;
         }
 
-        job.InterviewDate = reminderDto.InterviewDate;
+        job.InterviewDate = reminderDto.InterviewDate.Value.Date;
         job.ReminderDaysBeforeInterview = reminderDto.ReminderDaysBeforeInterview;
 
         await _jobRepository.UpdateJobAsync(job);
 
         if (reminderDto.InterviewDate.HasValue && reminderDto.ReminderDaysBeforeInterview > 0)
         {
-            var reminderDate = reminderDto.InterviewDate.Value.AddDays(-reminderDto.ReminderDaysBeforeInterview);
+            var reminderDate = reminderDto.InterviewDate.Value.AddDays(-reminderDto.ReminderDaysBeforeInterview).Date;
 
             var reminderNotification = new EmailNotification
             {
@@ -128,7 +131,7 @@ public class JobService : IJobService
                 Email = userEmail,
                 ScheduledDate = reminderDate,
                 Type = "reminder",
-                Message = $"Reminder: Your interview for '{job.Title}' at '{job.Company}' is scheduled on {job.InterviewDate:MMMM dd, yyyy}."
+                Message = $"Your interview for '{job.Title}' at '{job.Company}' is scheduled on {job.InterviewDate:MMMM dd, yyyy}."
             };
             _kafkaProducer.Produce("job-topic", Guid.NewGuid().ToString(), reminderNotification);
         }

@@ -14,13 +14,17 @@ namespace JobService.Models
         public string Title { get; set; }
         [BsonRequired]
         public string Company { get; set; }
-        public string[] Skills { get; set; }
+        public string[]? Skills { get; set; }
+        [BsonRepresentation(BsonType.String)]
         public string? Description { get; set; }
         public Location? Location { get; set; }
+        [BsonRepresentation(BsonType.DateTime)]
         public DateTime? AppliedDate { get; set; }
         [BsonRepresentation(BsonType.String)]
-        public string Status { get; set; }
+        public string? Status { get; set; } = "Saved";
+        [BsonRepresentation(BsonType.DateTime)]
         public DateTime? InterviewDate { get; set; }
+        [BsonRepresentation(BsonType.Int32)]
         public int? ReminderDaysBeforeInterview { get; set; }
     }
 }
