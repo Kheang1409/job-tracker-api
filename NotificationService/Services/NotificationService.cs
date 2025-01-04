@@ -9,12 +9,10 @@ namespace NotificationService.Services
 {
     public class NotificationService : INotificationService
     {
-        private readonly IConfiguration _configuration;
         private readonly EmailSettings _emailSettings;
 
-        public NotificationService(IConfiguration configuration, IOptions<EmailSettings> emailSettings)
+        public NotificationService(IOptions<EmailSettings> emailSettings)
         {
-            _configuration = configuration;
             _emailSettings = emailSettings.Value;
         }
 
@@ -22,7 +20,6 @@ namespace NotificationService.Services
         {
             try
             {
-                // Construct the email body with the reminder message and optional scheduled date
                 var emailBody = reminder.ScheduledDate != null
                     ? $"Reminder: {reminder.Message}\n\nScheduled Date: {reminder.ScheduledDate:MMMM dd, yyyy HH:mm}"
                     : $"Reminder: {reminder.Message}";
@@ -42,15 +39,12 @@ namespace NotificationService.Services
         {
             try
             {
-                // Construct the email body
                 var emailBody = $"Hello,\n\nGood luck with your interview! " +
                                 $"We hope you have a great experience. If you have any questions or need support, feel free to reach out.\n\n" +
                                 "Best regards,\nJobTrackerApp Team";
 
-                // Create the email message
                 var message = CreateEmailMessage(goodLuck.Email, "Good Luck with Your Interview!", emailBody);
 
-                // Send the email
                 await SendEmailAsync(message);
                 Console.WriteLine($"Good luck email sent to {goodLuck.Email}.");
             }
