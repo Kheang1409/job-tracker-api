@@ -95,17 +95,9 @@ namespace UserService.Controllers
                 return Unauthorized("Invalid email or password.");
             }
 
-            var token = _jwtService.GenerateToken(user.Id, user.Email);
+            var token = _jwtService.GenerateToken(user.Id, user.Email, user.Username);
             return Ok(new { Token = token });
         }
-
-        // private static string GenerateResetToken()
-        // {
-        //     using var rng = RandomNumberGenerator.Create();
-        //     var bytes = new byte[32];
-        //     rng.GetBytes(bytes);
-        //     return Convert.ToBase64String(bytes);
-        // }
 
         private static string GenerateOtp()
         {
