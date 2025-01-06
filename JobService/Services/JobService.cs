@@ -99,7 +99,7 @@ public class JobService : IJobService
         {
             return null;
         }
-        var existApplication = job.Applications.Where(_application => _application.UserId == application.UserId).First();
+        var existApplication = job.Applications.Find(_application => _application.UserId == application.UserId);
         if (existApplication == null)
         {
             job.Applications.Add(application);

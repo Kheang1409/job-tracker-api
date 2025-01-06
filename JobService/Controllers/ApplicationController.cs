@@ -21,21 +21,21 @@ namespace JobService.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AppliedJob(string id)
+        public async Task<IActionResult> AppliedJob(string jobId)
         {
             var authorizationResult = IsAuthorize();
             if (authorizationResult is IActionResult actionResult)
             {
                 return actionResult;
             }
-            if (!ObjectId.TryParse(id, out _))
+            if (!ObjectId.TryParse(jobId, out _))
             {
                 return BadRequest("The provided ID is not a valid MongoDB ObjectId.");
             }
 
             var authorizUser = (Application)authorizationResult;
 
-            var candidate = await _jobService.ApplyJobAsync(id, authorizUser);
+            var candidate = await _jobService.ApplyJobAsync(jobId, authorizUser);
             return Ok(candidate);
         }
 
