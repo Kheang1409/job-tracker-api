@@ -13,14 +13,30 @@ namespace JobService.Repositories
             _jobsCollection = database.GetCollection<Job>("Jobs");
         }
 
+        public async Task<IEnumerable<Job>> GetJobsAsync(int pageNumber, string userId)
+        {
+
+            var limit = 5;
+            var skip = (pageNumber - 1) * limit;
+            var filter = Builders<Job>.Filter.Empty;
+            if (!string.IsNullOrEmpty(userId))
+            {
+                filter = Builders<Job>.Filter.Eq(job => job.UserId, userId);
+            }
+            return await _jobsCollection.Find(filter).Skip(skip).Limit(limit).ToListAsync();
+        }
+
         public async Task<Job> GetJobByIdAsync(string id)
         {
             return await _jobsCollection.Find(j => j.Id == id).FirstOrDefaultAsync();
         }
 
-        public async Task<IEnumerable<Job>> GetJobsByUserIdAsync(string userId)
+        public async Task<int> GetTotalJobsCountAsync()
         {
-            return await _jobsCollection.Find(j => j.UserId == userId).ToListAsync();
+            var filter = Builders<Job>.Filter.Empty;
+            var jobsTotal = await _jobsCollection.CountDocumentsAsync(filter);
+
+            return (int)jobsTotal;
         }
 
         public async Task CreateJobAsync(Job job)

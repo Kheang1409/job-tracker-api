@@ -1,18 +1,15 @@
-using JobService.Models;
-
 namespace JobService.DTOs
 {
     public class JobDto
     {
-        public string UserId { get; set; }
         public string Title { get; set; }
         public string Company { get; set; }
+        public int? MinExperience { get; set; } = 0;
+        public int? MaxExperience { get; set; } = 0;
+        public double? MinSalary { get; set; } = 0.00;
+        public double? MaxSalary { get; set; } = 0.00;
         public string[]? Skills { get; set; }
         public string? Description { get; set; }
-        public Location? Location { get; set; }
-        public DateTime? AppliedDate { get; set; }
-        public string? Status { get; set; }
-        public DateTime? InterviewDate { get; set; }
-        public int? ReminderDaysBeforeInterview { get; set; }
+        public LocationDto? Location { get; set; }
     }
 }

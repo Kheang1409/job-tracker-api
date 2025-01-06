@@ -4,6 +4,7 @@ namespace JobService.Models
     {
         public string Id { get; set; }
         public string JobId { get; set; }
+        public string Username { get; set; }
         public string Email { get; set; }
         public DateTime ScheduledDate { get; set; }
         public string? Type { get; set; }

@@ -19,7 +19,33 @@ public class JobService : IJobService
         _kafkaProducer = kafkaProducer;
     }
 
-    public async Task<Job?> GetJobByIdAsync(string jobId, string userId)
+    public async Task<IEnumerable<Job>> GetJobsAsync(int pageNumber, string userId)
+    {
+        var jobs = await _jobRepository.GetJobsAsync(pageNumber, userId);
+        return _mapper.Map<IEnumerable<Job>>(jobs);
+    }
+
+    public async Task<Job?> GetJobByIdAsync(string jobId)
+    {
+        var job = await _jobRepository.GetJobByIdAsync(jobId);
+
+        if (job == null)
+        {
+            return null;
+        }
+
+        return job;
+    }
+
+    public async Task<Job> CreateJobAsync(JobDto createJobDto, string userId)
+    {
+        var job = _mapper.Map<Job>(createJobDto);
+        job.UserId = userId;
+        await _jobRepository.CreateJobAsync(job);
+        return _mapper.Map<Job>(job);
+    }
+
+    public async Task<JobDto?> FullUpdateJobAsync(string jobId, JobDto updateDto, string userId)
     {
         var job = await _jobRepository.GetJobByIdAsync(jobId);
 
@@ -28,42 +54,21 @@ public class JobService : IJobService
             return null;
         }
 
-        return new Job
-        {
-            Id = job.Id,
-            UserId = job.UserId,
-            Title = job.Title,
-            Skills = job.Skills,
-            Description = job.Description,
-            Company = job.Company,
-            Location = job.Location,
-            AppliedDate = job.AppliedDate,
-            Status = job.Status,
-            InterviewDate = job.InterviewDate,
-            ReminderDaysBeforeInterview = job.ReminderDaysBeforeInterview
-        };
+        job.Title = updateDto.Title;
+        job.Company = updateDto.Company;
+        job.MinExperience = updateDto.MinExperience;
+        job.MinSalary = updateDto.MinSalary;
+        job.MaxSalary = updateDto.MaxSalary;
+        job.Skills = updateDto.Skills;
+        job.Description = updateDto.Description;
+        job.Location = _mapper.Map<Location>(updateDto.Location);
+        job.ModifiedDate = DateTime.UtcNow;
+
+        await _jobRepository.UpdateJobAsync(job);
+        return _mapper.Map<JobDto>(job);
     }
 
-    public async Task<IEnumerable<Job>> GetJobsByUserIdAsync(string userId)
-    {
-        var jobs = await _jobRepository.GetJobsByUserIdAsync(userId);
-        return _mapper.Map<IEnumerable<Job>>(jobs);
-    }
-
-    public async Task<Job> CreateJobAsync(CreateJobDto createJobDto, string userId)
-    {
-        var job = _mapper.Map<Job>(createJobDto);
-        job.UserId = userId;
-        job.Status = createJobDto.Status;
-        if (job.Status == "Applied")
-            job.AppliedDate = DateTime.UtcNow;
-        await _jobRepository.CreateJobAsync(job);
-        return _mapper.Map<Job>(job);
-    }
-
-
-
-    public async Task<JobDto?> UpdateJobAsync(string jobId, UpdateJobDto updateDto, string userId)
+    public async Task<JobDto?> PartialUpdateJobAsync(string jobId, JobDto updateDto, string userId)
     {
         var job = await _jobRepository.GetJobByIdAsync(jobId);
 
@@ -73,41 +78,55 @@ public class JobService : IJobService
         }
 
         job.Title = updateDto.Title != null ? updateDto.Title : job.Title;
+        job.Company = updateDto.Company != null ? updateDto.Company : job.Company;
+        job.MinExperience = updateDto.MinExperience != null ? updateDto.MinExperience : job.MinExperience;
+        job.MinSalary = updateDto.MinSalary != null ? updateDto.MinSalary : job.MinSalary;
+        job.MaxSalary = updateDto.MaxSalary != null ? updateDto.MaxSalary : job.MaxSalary;
         job.Skills = updateDto.Skills != null ? updateDto.Skills : job.Skills;
         job.Description = updateDto.Description != null ? updateDto.Description : job.Description;
-        job.Location = updateDto.Location != null ? updateDto.Location : job.Location;
-        job.AppliedDate = updateDto.AppliedDate != null ? updateDto.AppliedDate : job.AppliedDate;
-        job.Status = updateDto.Status != null ? updateDto.Status : job.Status;
-        job.InterviewDate = updateDto.InterviewDate != null ? updateDto.InterviewDate : job.InterviewDate;
-        job.ReminderDaysBeforeInterview = updateDto.ReminderDaysBeforeInterview != null ? updateDto.ReminderDaysBeforeInterview : job.ReminderDaysBeforeInterview;
+        job.Location = updateDto.Location != null ? _mapper.Map<Location>(updateDto.Location) : job.Location;
+        job.ModifiedDate = DateTime.UtcNow;
 
         await _jobRepository.UpdateJobAsync(job);
-
         return _mapper.Map<JobDto>(job);
-
-        throw new ArgumentException("Invalid job status.");
     }
 
-    public async Task<JobDto?> UpdateJobStatusAsync(string jobId, UpdateJobStatusDto updateStatusDto, string userId)
+    public async Task<Application> ApplyJobAsync(string jobId, Application application)
     {
         var job = await _jobRepository.GetJobByIdAsync(jobId);
 
-        if (job == null || job.UserId != userId)
+        if (job == null && job.Status != "Active")
         {
             return null;
         }
-
-        job.Status = updateStatusDto.Status;
-        if (job.Status == "Applied" && job.AppliedDate == null)
-            job.AppliedDate = DateTime.UtcNow;
+        var existApplication = job.Applications.Where(_application => _application.UserId == application.UserId).First();
+        if (existApplication == null)
+        {
+            job.Applications.Add(application);
+            existApplication = application;
+        }
         await _jobRepository.UpdateJobAsync(job);
-
-        return _mapper.Map<JobDto>(job);
-
-        throw new ArgumentException("Invalid job status.");
+        return existApplication;
     }
 
-    public async Task<bool> SetInterviewReminderAsync(string jobId, SetInterviewReminderDto reminderDto, string userEmail)
+    public async Task<bool> DeleteJobAsync(string jobId, string userId)
+    {
+        var job = await _jobRepository.GetJobByIdAsync(jobId);
+        if (job == null || job.UserId != userId)
+        {
+            return false;
+        }
+        await _jobRepository.DeleteJobAsync(jobId);
+        return true;
+    }
+
+    public async Task<int> GetTotalJobsCountAsync()
+    {
+        int jobsCount = await _jobRepository.GetTotalJobsCountAsync();
+        return jobsCount;
+    }
+
+    public async Task<bool> SetInterviewReminderAsync(string jobId, string applicationId, SetInterviewReminderDto reminderDto, string userEmail)
     {
         var job = await _jobRepository.GetJobByIdAsync(jobId);
 
@@ -116,22 +135,29 @@ public class JobService : IJobService
             return false;
         }
 
-        job.InterviewDate = reminderDto.InterviewDate.Value.Date;
-        job.ReminderDaysBeforeInterview = reminderDto.ReminderDaysBeforeInterview;
+        var application = job?.Applications?.Where(_application => _application.Id == applicationId).First();
+        if (application == null)
+        {
+            return false;
+        }
 
+        application.InterviewDate = reminderDto?.InterviewDate?.Date;
+        application.Status = "Interview";
         await _jobRepository.UpdateJobAsync(job);
 
-        if (reminderDto.InterviewDate.HasValue && reminderDto.ReminderDaysBeforeInterview > 0)
+        if (reminderDto.InterviewDate.HasValue)
         {
-            var reminderDate = reminderDto.InterviewDate.Value.AddDays(-reminderDto.ReminderDaysBeforeInterview).Date;
+            var reminderDate = reminderDto.InterviewDate.Value.Date;
 
             var reminderNotification = new EmailNotification
             {
                 JobId = jobId,
-                Email = userEmail,
+                Username = application.Username,
+                Email = application.Email,
                 ScheduledDate = reminderDate,
                 Type = "reminder",
-                Message = $"Your interview for '{job.Title}' at '{job.Company}' is scheduled on {job.InterviewDate:MMMM dd, yyyy}."
+                Message = $"your interview for the position of '{job.Title}' at '{job.Company}' is scheduled for {reminderDate:MMMM dd, yyyy}."
+
             };
             _kafkaProducer.Produce("job-topic", Guid.NewGuid().ToString(), reminderNotification);
         }
@@ -141,6 +167,7 @@ public class JobService : IJobService
             var goodLuckNotification = new EmailNotification
             {
                 JobId = jobId,
+                Username = application.Username,
                 Email = userEmail,
                 ScheduledDate = reminderDto.InterviewDate.Value,
                 Type = "goodLuck",
@@ -151,17 +178,56 @@ public class JobService : IJobService
 
         return true;
     }
-
-    public async Task<bool> DeleteJobAsync(string jobId, string userId)
+    public async Task<Application> UpdateApplicationStatusAsync(string jobId, string applicationId, UpdateApplicationStatusDto statusDto, string ownerId)
     {
+
         var job = await _jobRepository.GetJobByIdAsync(jobId);
 
-        if (job == null || job.UserId != userId)
+        if (job == null && job.UserId != ownerId)
         {
-            return false;
+            return null;
         }
 
-        await _jobRepository.DeleteJobAsync(jobId);
-        return true;
+        var existApplication = job.Applications.Where(_application => _application.Id == applicationId).First();
+        if (existApplication == null)
+        {
+            return null;
+        }
+
+        existApplication.Status = statusDto.Status;
+        existApplication.Notes = statusDto.Notes;
+
+
+        if (existApplication.Status == "Rejected")
+        {
+            var rejectedNotification = new EmailNotification
+            {
+                JobId = jobId,
+                Username = existApplication.Username,
+                Email = existApplication.Email,
+                ScheduledDate = existApplication.InterviewDate.Value.Date,
+                Type = "rejected",
+                Message = $"We regret to inform you that your application for the '{job.Title}' position at '{job.Company}' has not been successful."
+            };
+            _kafkaProducer.Produce("job-topic", Guid.NewGuid().ToString(), rejectedNotification);
+        }
+
+        if (existApplication.Status == "Selected")
+        {
+            var selectedNotification = new EmailNotification
+            {
+                JobId = jobId,
+                Username = existApplication.Username,
+                Email = existApplication.Email,
+                ScheduledDate = statusDto.StartDate.Value.Date,
+                Type = "selected",
+                Message = $"Congratulations! We are excited to inform you that you have been selected for the '{job.Title}' position at '{job.Company}'!"
+            };
+            _kafkaProducer.Produce("job-topic", Guid.NewGuid().ToString(), selectedNotification);
+        }
+
+
+        await _jobRepository.UpdateJobAsync(job);
+        return existApplication;
     }
 }

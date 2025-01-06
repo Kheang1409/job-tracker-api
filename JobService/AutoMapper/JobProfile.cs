@@ -9,8 +9,7 @@ namespace JobService.AutoMapper
         public JobProfile()
         {
             CreateMap<Job, JobDto>().ReverseMap();
-
-            CreateMap<Job, CreateJobDto>().ReverseMap();
+            CreateMap<Location, LocationDto>().ReverseMap();
         }
     }
 }

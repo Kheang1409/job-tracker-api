@@ -1,5 +1,6 @@
 using System.Text;
 using JobService.AutoMapper;
+using JobService.Filter;
 using JobService.Kafka;
 using JobService.Repositories;
 using JobService.Services;
@@ -23,42 +24,23 @@ builder.Services.AddSwaggerGen(options =>
         In = ParameterLocation.Header,
         Description = "Enter your JWT token in the format: `Bearer {your token}`",
     });
+    options.OperationFilter<ApplyAuthorizeSecurityRequirement>();
+});
 
-    options.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            Array.Empty<string>()
-        }
-    });
-}); // Add Swagger
-
-// MongoDB Configuration - Prefer environment variables over appsettings.json
 string mongoConnectionString = Environment.GetEnvironmentVariable("MongoDB__ConnectionString")
                                ?? builder.Configuration.GetConnectionString("MongoDB");
 
 
 builder.Services.AddSingleton<IKafkaProducer, KafkaProducer>();
 
-// MongoDB Configuration
 builder.Services.AddSingleton<IMongoClient>(_ => new MongoClient(mongoConnectionString));
 
-// Repository registration
 builder.Services.AddScoped<IJobRepository, JobRepository>();
 builder.Services.AddScoped<IJobService, JobService.Services.JobService>();
 
-// Add AutoMapper to the service container
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddAutoMapper(typeof(JobProfile));
 
-// Enable Authentication (JWT Bearer)
 builder.Services.AddAuthentication("Bearer")
     .AddJwtBearer(options =>
     {
@@ -95,6 +77,16 @@ builder.Services.AddAuthentication("Bearer")
 
 builder.Services.AddAuthorization();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigin", policy =>
+    {
+        policy.WithOrigins("http://localhost:4200")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 var app = builder.Build();
 
 // Enable Swagger in development
@@ -105,6 +97,7 @@ if (app.Environment.IsDevelopment())
 }
 
 // Middleware order is crucial
+app.UseCors("AllowSpecificOrigin");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
