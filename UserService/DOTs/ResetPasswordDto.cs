@@ -1,8 +1,13 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace UserService.DTOs
 {
     public class ResetPasswordDto
     {
-        public string Otp { get; set; } = string.Empty;
-        public string NewPassword { get; set; } = string.Empty;
+        [Required(ErrorMessage = "Otp is required.")]
+        public string Otp { get; set; }
+        [Required(ErrorMessage = "Password is required.")]
+        [MinLength(6, ErrorMessage = "Password must be at least 6 characters.")]
+        public string NewPassword { get; set; }
     }
 }

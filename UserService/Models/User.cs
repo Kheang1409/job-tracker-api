@@ -8,10 +8,17 @@ namespace UserService.Models
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; } = ObjectId.GenerateNewId().ToString();
-        public string Username { get; set; } = string.Empty;
-        public string Email { get; set; } = string.Empty;
-        public string PasswordHash { get; set; } = string.Empty;
-        public string OPT { get; set; } = string.Empty;
+        [BsonRepresentation(BsonType.String)]
+        public string Username { get; set; }
+        [BsonRequired]
+        [BsonRepresentation(BsonType.String)]
+        public string Email { get; set; }
+        [BsonRequired]
+        [BsonRepresentation(BsonType.String)]
+        public string PasswordHash { get; set; }
+        [BsonRepresentation(BsonType.String)]
+        public string? OPT { get; set; }
+        [BsonRepresentation(BsonType.DateTime)]
         public DateTime? OPTExpiry { get; set; }
     }
 }

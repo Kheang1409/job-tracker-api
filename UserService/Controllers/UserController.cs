@@ -10,7 +10,7 @@ using UserService.Kafka;
 namespace UserService.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/users")]
     public class UserController : ControllerBase
     {
         private readonly IUserRepository _userRepository;
@@ -24,12 +24,17 @@ namespace UserService.Controllers
             _kafkaProducer = kafkaProducer;
         }
 
-        [HttpPost("register")]
+        [HttpPost]
         public async Task<IActionResult> Register(RegisterDto dto)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new { message = "Invalid input", errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList() });
+            }
+
             if (await _userRepository.GetByEmailAsync(dto.Email) != null)
             {
-                return BadRequest("Email is already registered.");
+                return BadRequest(new { message = "Email is already registered!", statusCode = 400 });
             }
 
             var user = new User
@@ -40,12 +45,19 @@ namespace UserService.Controllers
             };
 
             await _userRepository.AddUserAsync(user);
-            return Ok("User registered successfully.");
+
+            return Ok(user);
         }
 
         [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgetPasswordDto forgetPasswordDto)
         {
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new { message = "Invalid input", errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList() });
+            }
+
             var email = forgetPasswordDto.Email;
             var user = await _userRepository.GetByEmailAsync(email);
             if (user == null)
@@ -72,11 +84,15 @@ namespace UserService.Controllers
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword(ResetPasswordDto dto)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new { message = "Invalid input", errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList() });
+            }
+
             var user = await _userRepository.GetByOPTAsync(dto.Otp);
             if (user == null)
-                return BadRequest("Invalid or expired OTP.");
+                return BadRequest(new { message = "Invalid or expired OTP.", statusCode = 400 });
 
-            // Update password
             user.PasswordHash = HashPassword(dto.NewPassword);
             user.OPT = string.Empty;
             user.OPTExpiry = null;
@@ -89,6 +105,11 @@ namespace UserService.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto dto)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new { message = "Invalid input", errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList() });
+            }
+
             var user = await _userRepository.GetByEmailAsync(dto.Email);
             if (user == null || !VerifyPassword(dto.Password, user.PasswordHash))
             {
