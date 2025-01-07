@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+
 namespace UserService.DTOs
 {
     public class LoginDto

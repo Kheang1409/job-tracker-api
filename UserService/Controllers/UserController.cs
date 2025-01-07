@@ -113,7 +113,7 @@ namespace UserService.Controllers
             var user = await _userRepository.GetByEmailAsync(dto.Email);
             if (user == null || !VerifyPassword(dto.Password, user.PasswordHash))
             {
-                return Unauthorized("Invalid email or password.");
+                return Unauthorized(new { message = "Invalid email or password." });
             }
 
             var token = _jwtService.GenerateToken(user.Id, user.Email, user.Username);
