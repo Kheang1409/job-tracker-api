@@ -19,9 +19,9 @@ public class JobService : IJobService
         _kafkaProducer = kafkaProducer;
     }
 
-    public async Task<IEnumerable<Job>> GetJobsAsync(int pageNumber, string userId)
+    public async Task<IEnumerable<Job>> GetJobsAsync(int pageNumber, string status)
     {
-        var jobs = await _jobRepository.GetJobsAsync(pageNumber, userId);
+        var jobs = await _jobRepository.GetJobsAsync(pageNumber, status);
         return _mapper.Map<IEnumerable<Job>>(jobs);
     }
 
@@ -45,11 +45,11 @@ public class JobService : IJobService
         return _mapper.Map<Job>(job);
     }
 
-    public async Task<JobDto?> FullUpdateJobAsync(string jobId, JobDto updateDto, string userId)
+    public async Task<JobDto?> FullUpdateJobAsync(string jobId, JobDto updateDto, string ownerId)
     {
         var job = await _jobRepository.GetJobByIdAsync(jobId);
 
-        if (job == null || job.UserId != userId)
+        if (job == null || job.UserId != ownerId)
         {
             return null;
         }
@@ -68,11 +68,11 @@ public class JobService : IJobService
         return _mapper.Map<JobDto>(job);
     }
 
-    public async Task<JobDto?> PartialUpdateJobAsync(string jobId, JobDto updateDto, string userId)
+    public async Task<JobDto?> PartialUpdateJobAsync(string jobId, JobDto updateDto, string ownerId)
     {
         var job = await _jobRepository.GetJobByIdAsync(jobId);
 
-        if (job == null || job.UserId != userId)
+        if (job == null || job.UserId != ownerId)
         {
             return null;
         }
@@ -89,6 +89,20 @@ public class JobService : IJobService
 
         await _jobRepository.UpdateJobAsync(job);
         return _mapper.Map<JobDto>(job);
+    }
+
+    public async Task<Job> UpdateJobStatus(string jobId, string ownerId)
+    {
+        var job = await _jobRepository.GetJobByIdAsync(jobId);
+
+        if (job == null || job.UserId != ownerId)
+        {
+            return null;
+        }
+        job.Status = job.Status == "Active" ? "Inactive" : "Active";
+        job.ModifiedDate = DateTime.UtcNow;
+        await _jobRepository.UpdateJobAsync(job);
+        return job;
     }
 
     public async Task<Application> ApplyJobAsync(string jobId, Application application)
@@ -120,9 +134,9 @@ public class JobService : IJobService
         return true;
     }
 
-    public async Task<int> GetTotalJobsCountAsync()
+    public async Task<int> GetTotalJobsCountAsync(string status)
     {
-        int jobsCount = await _jobRepository.GetTotalJobsCountAsync();
+        int jobsCount = await _jobRepository.GetTotalJobsCountAsync(status);
         return jobsCount;
     }
 

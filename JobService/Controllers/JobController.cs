@@ -22,22 +22,18 @@ namespace JobService.Controllers
 
         [AllowAnonymous]
         [HttpGet]
-        public async Task<IActionResult> GetJobs([FromQuery] int? PageNumber = 1, [FromQuery] string? UserId = null)
+        public async Task<IActionResult> GetJobs([FromQuery] int? PageNumber = 1, [FromQuery] string? Status = null)
         {
-            if (!string.IsNullOrEmpty(UserId) && !ObjectId.TryParse(UserId, out _))
-            {
-                return BadRequest("The provided ID is not a valid MongoDB ObjectId.");
-            }
-            var jobs = await _jobService.GetJobsAsync((int)PageNumber, UserId);
+            var jobs = await _jobService.GetJobsAsync((int)PageNumber, Status);
             return Ok(jobs);
         }
 
         [Route("totals")]
         [AllowAnonymous]
         [HttpGet]
-        public async Task<IActionResult> GetTotalJobsCount()
+        public async Task<IActionResult> GetTotalJobsCount([FromQuery] string? Status = null)
         {
-            var jobs = await _jobService.GetTotalJobsCountAsync();
+            var jobs = await _jobService.GetTotalJobsCountAsync(Status);
             return Ok(jobs);
         }
 
@@ -106,6 +102,25 @@ namespace JobService.Controllers
 
             var authorizUser = (Application)authorizationResult;
             var job = await _jobService.PartialUpdateJobAsync(id, updateJob, authorizUser.UserId);
+            return Ok(job);
+        }
+
+        [HttpPut("{id}/status")]
+        public async Task<IActionResult> UpdateJobStatus(string id)
+        {
+            var authorizationResult = IsAuthorize();
+            if (authorizationResult is IActionResult actionResult)
+            {
+                return actionResult;
+            }
+            if (!ObjectId.TryParse(id, out _))
+            {
+                return BadRequest("The provided ID is not a valid MongoDB ObjectId.");
+            }
+            var authorizUser = (Application)authorizationResult;
+            Console.WriteLine("Am Here");
+            Console.WriteLine($"UserId: {authorizUser.UserId}");
+            var job = await _jobService.UpdateJobStatus(id, authorizUser.UserId);
             return Ok(job);
         }
 

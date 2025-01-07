@@ -13,15 +13,14 @@ namespace JobService.Repositories
             _jobsCollection = database.GetCollection<Job>("Jobs");
         }
 
-        public async Task<IEnumerable<Job>> GetJobsAsync(int pageNumber, string userId)
+        public async Task<IEnumerable<Job>> GetJobsAsync(int pageNumber, string status)
         {
-
             var limit = 5;
             var skip = (pageNumber - 1) * limit;
             var filter = Builders<Job>.Filter.Empty;
-            if (!string.IsNullOrEmpty(userId))
+            if (!string.IsNullOrEmpty(status))
             {
-                filter = Builders<Job>.Filter.Eq(job => job.UserId, userId);
+                filter = Builders<Job>.Filter.Eq(job => job.Status, status);
             }
             return await _jobsCollection.Find(filter).Skip(skip).Limit(limit).ToListAsync();
         }
@@ -31,10 +30,14 @@ namespace JobService.Repositories
             return await _jobsCollection.Find(j => j.Id == id).FirstOrDefaultAsync();
         }
 
-        public async Task<int> GetTotalJobsCountAsync()
+        public async Task<int> GetTotalJobsCountAsync(string status)
         {
             var filter = Builders<Job>.Filter.Empty;
-            var jobsTotal = await _jobsCollection.CountDocumentsAsync(filter);
+            if (!string.IsNullOrEmpty(status))
+            {
+                filter = Builders<Job>.Filter.Eq(job => job.Status, status);
+            }
+            var jobsTotal = await _jobsCollection.Find(filter).CountDocumentsAsync();
 
             return (int)jobsTotal;
         }
