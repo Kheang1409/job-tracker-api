@@ -54,7 +54,9 @@ builder.Services.AddAuthentication("Bearer")
             },
             OnTokenValidated = context =>
             {
-                Console.WriteLine($"Token validated for: {context.Principal?.Identity?.Name}");
+                var username = context.Principal?.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname")?.Value
+                   ?? "No username claim";
+                Console.WriteLine($"Token validated for: {username}");
                 return Task.CompletedTask;
             }
         };

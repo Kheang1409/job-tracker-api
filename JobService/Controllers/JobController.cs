@@ -118,8 +118,6 @@ namespace JobService.Controllers
                 return BadRequest("The provided ID is not a valid MongoDB ObjectId.");
             }
             var authorizUser = (Application)authorizationResult;
-            Console.WriteLine("Am Here");
-            Console.WriteLine($"UserId: {authorizUser.UserId}");
             var job = await _jobService.UpdateJobStatus(id, authorizUser.UserId);
             return Ok(job);
         }
