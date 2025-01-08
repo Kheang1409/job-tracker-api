@@ -13,7 +13,7 @@ namespace JobService.Repositories
             _jobsCollection = database.GetCollection<Job>("Jobs");
         }
 
-        public async Task<IEnumerable<Job>> GetJobsAsync(int pageNumber, string status)
+        public async Task<IEnumerable<Job>> GetJobsAsync(int pageNumber, string status, string sort)
         {
             var limit = 5;
             var skip = (pageNumber - 1) * limit;
@@ -22,7 +22,13 @@ namespace JobService.Repositories
             {
                 filter = Builders<Job>.Filter.Eq(job => job.Status, status);
             }
-            return await _jobsCollection.Find(filter).Skip(skip).Limit(limit).ToListAsync();
+            var sortDefinition = sort switch
+            {
+                "asc" => Builders<Job>.Sort.Ascending(job => job.CreatedDate),
+                "desc" => Builders<Job>.Sort.Descending(job => job.CreatedDate),
+                _ => Builders<Job>.Sort.Descending(job => job.CreatedDate)
+            };
+            return await _jobsCollection.Find(filter).Sort(sortDefinition).Skip(skip).Limit(limit).ToListAsync();
         }
 
         public async Task<Job> GetJobByIdAsync(string id)

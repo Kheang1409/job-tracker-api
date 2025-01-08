@@ -87,15 +87,15 @@ namespace JobService.Controllers
                     return BadRequest("The provided ID is not a valid MongoDB ObjectId.");
                 }
 
-                var authorizUser = (Application)authorizationResult;
+                var application = (Application)authorizationResult;
 
                 var job = await _jobService.GetJobByIdAsync(jobId);
-                if (job == null || job.UserId != authorizUser.UserId)
+                if (job == null || job.UserId != application.UserId)
                 {
                     return NotFound("Job not found or unauthorized access.");
                 }
 
-                await _jobService.UpdateApplicationStatusAsync(jobId, applicationId, statusDto, authorizUser.UserId);
+                await _jobService.UpdateApplicationStatusAsync(jobId, applicationId, statusDto, application.UserId);
 
                 return Ok("Application's status has been set successfully.");
             }
@@ -115,7 +115,6 @@ namespace JobService.Controllers
             authorizUser.UserId = userId;
             authorizUser.Email = email;
             authorizUser.Username = username;
-
 
             if (string.IsNullOrEmpty(userId))
             {

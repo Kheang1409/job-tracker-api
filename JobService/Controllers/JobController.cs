@@ -22,9 +22,9 @@ namespace JobService.Controllers
 
         [AllowAnonymous]
         [HttpGet]
-        public async Task<IActionResult> GetJobs([FromQuery] int? PageNumber = 1, [FromQuery] string? Status = null)
+        public async Task<IActionResult> GetJobs([FromQuery] int? PageNumber = 1, [FromQuery] string? Status = null, [FromQuery] string? Sort = null)
         {
-            var jobs = await _jobService.GetJobsAsync((int)PageNumber, Status);
+            var jobs = await _jobService.GetJobsAsync((int)PageNumber, Status, Sort);
             return Ok(jobs);
         }
 
@@ -45,8 +45,8 @@ namespace JobService.Controllers
             {
                 return actionResult;
             }
-            var authorizUser = (Application)authorizationResult;
-            var job = await _jobService.CreateJobAsync(dto, authorizUser.Id);
+            var authorizUser = (AuthorizedUser)authorizationResult;
+            var job = await _jobService.CreateJobAsync(dto, authorizUser.UserId);
             return Ok(job);
         }
 
@@ -82,7 +82,7 @@ namespace JobService.Controllers
                 return BadRequest("The provided ID is not a valid MongoDB ObjectId.");
             }
 
-            var authorizUser = (Application)authorizationResult;
+            var authorizUser = (AuthorizedUser)authorizationResult;
             var job = await _jobService.FullUpdateJobAsync(id, updateJob, authorizUser.UserId);
             return Ok(job);
         }
@@ -100,7 +100,7 @@ namespace JobService.Controllers
                 return BadRequest("The provided ID is not a valid MongoDB ObjectId.");
             }
 
-            var authorizUser = (Application)authorizationResult;
+            var authorizUser = (AuthorizedUser)authorizationResult;
             var job = await _jobService.PartialUpdateJobAsync(id, updateJob, authorizUser.UserId);
             return Ok(job);
         }
@@ -117,7 +117,7 @@ namespace JobService.Controllers
             {
                 return BadRequest("The provided ID is not a valid MongoDB ObjectId.");
             }
-            var authorizUser = (Application)authorizationResult;
+            var authorizUser = (AuthorizedUser)authorizationResult;
             var job = await _jobService.UpdateJobStatus(id, authorizUser.UserId);
             return Ok(job);
         }
@@ -135,9 +135,9 @@ namespace JobService.Controllers
                 return BadRequest("The provided ID is not a valid MongoDB ObjectId.");
             }
 
-            var authorizUser = (Application)authorizationResult;
+            var authorizUser = (AuthorizedUser)authorizationResult;
 
-            var deleted = await _jobService.DeleteJobAsync(id, authorizUser.Id);
+            var deleted = await _jobService.DeleteJobAsync(id, authorizUser.UserId);
 
             if (!deleted)
             {
@@ -153,7 +153,7 @@ namespace JobService.Controllers
             var email = User.FindFirst(ClaimTypes.Email)?.Value;
             var username = User.FindFirst(ClaimTypes.GivenName)?.Value;
 
-            var authorizUser = new Application();
+            var authorizUser = new AuthorizedUser();
             authorizUser.UserId = userId;
             authorizUser.Email = email;
             authorizUser.Username = username;

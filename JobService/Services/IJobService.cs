@@ -5,7 +5,7 @@ namespace JobService.Services
 {
     public interface IJobService
     {
-        Task<IEnumerable<Job>> GetJobsAsync(int pageNumber, string status);
+        Task<IEnumerable<Job>> GetJobsAsync(int pageNumber, string status, string sort);
         Task<Job> GetJobByIdAsync(string id);
         Task<Job> CreateJobAsync(JobDto createJobDto, string ownerId);
         Task<JobDto?> FullUpdateJobAsync(string jobId, JobDto updateJobDto, string ownerId);

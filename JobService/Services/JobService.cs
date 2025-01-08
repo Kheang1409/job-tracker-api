@@ -19,9 +19,9 @@ public class JobService : IJobService
         _kafkaProducer = kafkaProducer;
     }
 
-    public async Task<IEnumerable<Job>> GetJobsAsync(int pageNumber, string status)
+    public async Task<IEnumerable<Job>> GetJobsAsync(int pageNumber, string status, string sort)
     {
-        var jobs = await _jobRepository.GetJobsAsync(pageNumber, status);
+        var jobs = await _jobRepository.GetJobsAsync(pageNumber, status, sort);
         return _mapper.Map<IEnumerable<Job>>(jobs);
     }
 
@@ -37,10 +37,10 @@ public class JobService : IJobService
         return job;
     }
 
-    public async Task<Job> CreateJobAsync(JobDto createJobDto, string userId)
+    public async Task<Job> CreateJobAsync(JobDto createJobDto, string ownerId)
     {
         var job = _mapper.Map<Job>(createJobDto);
-        job.UserId = userId;
+        job.UserId = ownerId;
         await _jobRepository.CreateJobAsync(job);
         return _mapper.Map<Job>(job);
     }
