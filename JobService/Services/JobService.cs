@@ -56,6 +56,7 @@ public class JobService : IJobService
 
         job.Title = updateDto.Title;
         job.Company = updateDto.Company;
+        job.MaxPosition = updateDto.MaxPosition ?? 1;
         job.MinExperience = updateDto.MinExperience;
         job.MinSalary = updateDto.MinSalary;
         job.MaxSalary = updateDto.MaxSalary;
@@ -77,13 +78,14 @@ public class JobService : IJobService
             return null;
         }
 
-        job.Title = updateDto.Title != null ? updateDto.Title : job.Title;
-        job.Company = updateDto.Company != null ? updateDto.Company : job.Company;
-        job.MinExperience = updateDto.MinExperience != null ? updateDto.MinExperience : job.MinExperience;
-        job.MinSalary = updateDto.MinSalary != null ? updateDto.MinSalary : job.MinSalary;
-        job.MaxSalary = updateDto.MaxSalary != null ? updateDto.MaxSalary : job.MaxSalary;
-        job.Skills = updateDto.Skills != null ? updateDto.Skills : job.Skills;
-        job.Description = updateDto.Description != null ? updateDto.Description : job.Description;
+        job.Title = updateDto.Title ?? job.Title;
+        job.Company = updateDto.Company ?? job.Company;
+        job.MaxPosition = updateDto.MaxPosition ?? job.MaxPosition;
+        job.MinExperience = updateDto.MinExperience ?? job.MinExperience;
+        job.MinSalary = updateDto.MinSalary ?? job.MinSalary;
+        job.MaxSalary = updateDto.MaxSalary ?? job.MaxSalary;
+        job.Skills = updateDto.Skills ?? job.Skills;
+        job.Description = updateDto.Description ?? job.Description;
         job.Location = updateDto.Location != null ? _mapper.Map<Location>(updateDto.Location) : job.Location;
         job.ModifiedDate = DateTime.UtcNow;
 
