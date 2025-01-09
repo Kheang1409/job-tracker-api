@@ -4,7 +4,6 @@ namespace JobService.DTOs
     {
         public string? Notes { get; set; }
         public string Status { get; set; }
-
-        public DateTime? StartDate { get; set; }
+        public DateTime? DateToRemeber { get; set; }
     }
 }

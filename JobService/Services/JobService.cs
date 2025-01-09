@@ -142,108 +142,92 @@ public class JobService : IJobService
         return jobsCount;
     }
 
-    public async Task<bool> SetInterviewReminderAsync(string jobId, string applicationId, SetInterviewReminderDto reminderDto, string userEmail)
-    {
-        var job = await _jobRepository.GetJobByIdAsync(jobId);
-
-        if (job == null)
-        {
-            return false;
-        }
-
-        var application = job?.Applications?.Where(_application => _application.Id == applicationId).First();
-        if (application == null)
-        {
-            return false;
-        }
-
-        application.InterviewDate = reminderDto?.InterviewDate?.Date;
-        application.Status = "Interview";
-        await _jobRepository.UpdateJobAsync(job);
-
-        if (reminderDto.InterviewDate.HasValue)
-        {
-            var reminderDate = reminderDto.InterviewDate.Value.Date;
-
-            var reminderNotification = new EmailNotification
-            {
-                JobId = jobId,
-                Username = application.Username,
-                Email = application.Email,
-                ScheduledDate = reminderDate,
-                Type = "reminder",
-                Message = $"your interview for the position of '{job.Title}' at '{job.Company}' is scheduled for {reminderDate:MMMM dd, yyyy}."
-
-            };
-            _kafkaProducer.Produce("job-topic", Guid.NewGuid().ToString(), reminderNotification);
-        }
-
-        if (reminderDto.InterviewDate.HasValue)
-        {
-            var goodLuckNotification = new EmailNotification
-            {
-                JobId = jobId,
-                Username = application.Username,
-                Email = userEmail,
-                ScheduledDate = reminderDto.InterviewDate.Value,
-                Type = "goodLuck",
-                Message = $"Good Luck on your interview for '{job.Title}' at '{job.Company}'!"
-            };
-            _kafkaProducer.Produce("job-topic", Guid.NewGuid().ToString(), goodLuckNotification);
-        }
-
-        return true;
-    }
-    public async Task<Application> UpdateApplicationStatusAsync(string jobId, string applicationId, UpdateApplicationStatusDto statusDto, string ownerId)
+    public async Task<bool> UpdateApplicationStatusAsync(string jobId, string applicationId, UpdateApplicationStatusDto statusDto, string ownerId)
     {
 
         var job = await _jobRepository.GetJobByIdAsync(jobId);
 
         if (job == null && job.UserId != ownerId)
         {
-            return null;
+            return false;
         }
 
         var existApplication = job.Applications.Where(_application => _application.Id == applicationId).First();
         if (existApplication == null)
         {
-            return null;
+            return false;
         }
 
         existApplication.Status = statusDto.Status;
         existApplication.Notes = statusDto.Notes;
 
 
+        var emailNotification = new EmailNotification
+        {
+            JobId = jobId,
+            Username = existApplication.Username,
+            Email = existApplication.Email,
+            ScheduledDate = existApplication.InterviewDate.Value.Date,
+            Type = "statusUpdate",
+            Message = ""
+        };
+
+        if (existApplication.Status == "Interview")
+        {
+
+            existApplication.InterviewDate = statusDto.DateToRemeber;
+
+            emailNotification.Message = $"Dear {existApplication.Username},\n\n" +
+            $"We are pleased to inform you that your interview for the position of '{job.Title}' at '{job.Company}' is scheduled for {existApplication.InterviewDate.Value:MMMM dd, yyyy} at {existApplication.InterviewDate.Value:hh:mm tt}.\n\n" +
+            "Please make sure to be prepared and arrive on time. If you have any questions or require further assistance, don't hesitate to reach out to us.\n\n" +
+            "Best regards,\nJobTrackerApp Team";
+
+            var goodLuckNotification = GenerateGoodLuckMessageAsync(jobId, existApplication, job.Title, job.Company);
+            _kafkaProducer.Produce("job-topic", Guid.NewGuid().ToString(), goodLuckNotification);
+        }
+
         if (existApplication.Status == "Rejected")
         {
-            var rejectedNotification = new EmailNotification
-            {
-                JobId = jobId,
-                Username = existApplication.Username,
-                Email = existApplication.Email,
-                ScheduledDate = existApplication.InterviewDate.Value.Date,
-                Type = "rejected",
-                Message = $"We regret to inform you that your application for the '{job.Title}' position at '{job.Company}' has not been successful."
-            };
-            _kafkaProducer.Produce("job-topic", Guid.NewGuid().ToString(), rejectedNotification);
+            emailNotification.Message = $"Dear {existApplication.Username},\n\n" +
+            $"We regret to inform you that you have not been selected for the position of '{job.Title}' at '{job.Company}'.\n\n" +
+            "We appreciate the time and effort you spent in the application process and wish you the best of luck in your future endeavors.\n\n" +
+            "Best regards,\nJobTrackerApp Team";
         }
 
         if (existApplication.Status == "Selected")
         {
-            var selectedNotification = new EmailNotification
-            {
-                JobId = jobId,
-                Username = existApplication.Username,
-                Email = existApplication.Email,
-                ScheduledDate = statusDto.StartDate.Value.Date,
-                Type = "selected",
-                Message = $"Congratulations! We are excited to inform you that you have been selected for the '{job.Title}' position at '{job.Company}'!"
-            };
-            _kafkaProducer.Produce("job-topic", Guid.NewGuid().ToString(), selectedNotification);
+            emailNotification.Message = $"Dear {existApplication.Username},\n\n" +
+            $"Congratulations! We are excited to inform you that you have been selected for the position of '{job.Title}' at '{job.Company}'.\n\n" +
+            $"Your official start date is {statusDto.DateToRemeber:MMMM dd, yyyy}.\n\n" +
+            "Our team will reach out to you shortly with further instructions regarding the next steps. We are excited to have you on board!\n\n" +
+            "Best regards,\nJobTrackerApp Team";
         }
-
+        await GenerateKafkaMessageAsync(emailNotification);
 
         await _jobRepository.UpdateJobAsync(job);
-        return existApplication;
+        return true;
+    }
+
+    private async Task GenerateKafkaMessageAsync(EmailNotification emailNotificaiton)
+    {
+        _kafkaProducer.Produce("job-topic", Guid.NewGuid().ToString(), emailNotificaiton);
+    }
+
+    private async Task<EmailNotification> GenerateGoodLuckMessageAsync(string jobId, Application application, string title, string company)
+    {
+        var goodLuckNotification = new EmailNotification
+        {
+            JobId = jobId,
+            Username = application.Username,
+            Email = application.Email,
+            ScheduledDate = application.InterviewDate.Value,
+            Type = "goodLuck",
+            Message = $"Dear {application.Username},\n\n" +
+                    $"Good Luck on your interview for '{title}' at '{company}'!\n\n" +
+                    "We hope you have a great experience. Please make sure to be prepared and arrive on time. If you have any questions or require further assistance, don't hesitate to reach out to us.\n\n" +
+                    "Best regards,\nJobTrackerApp Team"
+        };
+        _kafkaProducer.Produce("job-topic", Guid.NewGuid().ToString(), goodLuckNotification);
+        return goodLuckNotification;
     }
 }

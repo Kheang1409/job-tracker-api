@@ -1,3 +1,4 @@
+using Confluent.Kafka;
 using JobService.DTOs;
 using JobService.Models;
 using JobService.Services;
@@ -39,40 +40,7 @@ namespace JobService.Controllers
             return Ok(candidate);
         }
 
-        [HttpPatch("{applicationId}/interview")]
-        public async Task<IActionResult> SetInterviewReminder(string jobId, string applicationId, [FromBody] SetInterviewReminderDto reminderDto)
-        {
-            try
-            {
-                var authorizationResult = IsAuthorize();
-                if (authorizationResult is IActionResult actionResult)
-                {
-                    return actionResult;
-                }
-                if (!ObjectId.TryParse(jobId, out _))
-                {
-                    return BadRequest("The provided ID is not a valid MongoDB ObjectId.");
-                }
-
-                var authorizUser = (Application)authorizationResult;
-
-                var job = await _jobService.GetJobByIdAsync(jobId);
-                if (job == null || job.UserId != authorizUser.UserId)
-                {
-                    return NotFound("Job not found or unauthorized access.");
-                }
-
-                await _jobService.SetInterviewReminderAsync(jobId, applicationId, reminderDto, authorizUser.UserId);
-
-                return Ok("Interview reminder has been set successfully.");
-            }
-            catch (Exception ex)
-            {
-                return BadRequest($"Failed to set interview reminder: {ex.Message}");
-            }
-        }
-
-        [HttpPatch("{applicationId}/status")]
+        [HttpPatch("{applicationId}")]
         public async Task<IActionResult> UpdateApplicationStatus(string jobId, string applicationId, [FromBody] UpdateApplicationStatusDto statusDto)
         {
             try
@@ -97,11 +65,11 @@ namespace JobService.Controllers
 
                 await _jobService.UpdateApplicationStatusAsync(jobId, applicationId, statusDto, application.UserId);
 
-                return Ok("Application's status has been set successfully.");
+                return Ok(new { message = "Application's status has been set successfully." });
             }
             catch (Exception ex)
             {
-                return BadRequest($"Failed to set status: {ex.Message}");
+                return BadRequest(new { message = $"Failed to set status: {ex.Message}" });
             }
         }
 

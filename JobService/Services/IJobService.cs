@@ -14,8 +14,8 @@ namespace JobService.Services
         Task<Application> ApplyJobAsync(string jobId, Application application);
         Task<bool> DeleteJobAsync(string jobId, string ownerId);
         Task<int> GetTotalJobsCountAsync(string status);
-        Task<bool> SetInterviewReminderAsync(string jobId, string applicationId, SetInterviewReminderDto reminderDto, string userEmail);
-        Task<Application> UpdateApplicationStatusAsync(string jobId, string applicationId, UpdateApplicationStatusDto statusDto, string ownerId);
+        // Task<bool> SetInterviewReminderAsync(string jobId, string applicationId, SetInterviewReminderDto reminderDto, string userEmail);
+        Task<bool> UpdateApplicationStatusAsync(string jobId, string applicationId, UpdateApplicationStatusDto statusDto, string ownerId);
 
     }
 }
