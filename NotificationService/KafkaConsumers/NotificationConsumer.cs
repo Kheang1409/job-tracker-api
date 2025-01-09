@@ -45,16 +45,8 @@ public class NotificationConsumer : BackgroundService
                                 await HandleResetPassword(payload);
                                 break;
 
-                            case "rejected":
-                                await HandleReject(payload);
-                                break;
-
-                            case "selected":
-                                await HandleSelected(payload);
-                                break;
-
-                            case "reminder":
-                                await HandleReminder(payload);
+                            case "statusUpdate":
+                                await HandleStatusUpdate(payload);
                                 break;
 
                             case "goodLuck":
@@ -119,78 +111,6 @@ public class NotificationConsumer : BackgroundService
         await SendNotification(notification, async () =>
             await _notificationService.SendResetPasswordEmail(notification));
     }
-
-    // Handler for Status Update Notification
-    private async Task HandleReject(dynamic payload)
-    {
-        if (payload?.Email == null || payload?.Message == null || payload?.ScheduledDate == null ||
-            !IsValidEmail(payload?.Email.ToString()))
-        {
-            Console.WriteLine($"Check: {payload?.Email}, {payload?.Message}, {payload?.ScheduledDate}");
-            Console.WriteLine("Invalid Reminder payload. Skipping...");
-            return;
-        }
-
-        var notification = new UpdateDateNotification
-        {
-            Type = "rejected",
-            Username = payload.Username.ToString(),
-            Email = payload.Email.ToString(),
-            Message = payload.Message.ToString()
-        };
-
-        await SendNotification(notification, async () =>
-                        await _notificationService.SendRejectedEmail(notification));
-    }
-
-    private async Task HandleSelected(dynamic payload)
-    {
-        if (payload?.Email == null || payload?.Message == null || payload?.ScheduledDate == null ||
-            !IsValidEmail(payload?.Email.ToString()))
-        {
-            Console.WriteLine($"Check: {payload?.Email}, {payload?.Message}, {payload?.ScheduledDate}");
-            Console.WriteLine("Invalid Reminder payload. Skipping...");
-            return;
-        }
-
-        var notification = new UpdateDateNotification
-        {
-            Type = "selected",
-            Username = payload.Username.ToString(),
-            Email = payload.Email.ToString(),
-            Message = payload.Message.ToString(),
-            ScheduledDate = DateTime.Parse(payload.ScheduledDate.ToString())
-        };
-
-        await SendNotification(notification, async () =>
-                        await _notificationService.SendSelectedEmail(notification));
-    }
-
-    // Handler for Reminder Notification
-    private async Task HandleReminder(dynamic payload)
-    {
-        if (payload?.Email == null || payload?.Message == null || payload?.ScheduledDate == null ||
-            !IsValidEmail(payload?.Email.ToString()))
-        {
-            Console.WriteLine($"Check: {payload?.Email}, {payload?.Message}, {payload?.ScheduledDate}");
-            Console.WriteLine("Invalid Reminder payload. Skipping...");
-            return;
-        }
-
-        var notification = new ReminderNotification
-        {
-            Type = "reminder",
-            Username = payload.Username.ToString(),
-            Email = payload.Email.ToString(),
-            Message = payload.Message.ToString(),
-            ScheduledDate = DateTime.Parse(payload.ScheduledDate.ToString())
-        };
-
-        await SendNotification(notification, async () =>
-                        await _notificationService.SendReminderEmail(notification));
-    }
-
-    // Handler for Good Luck Notification
     private async Task HandleGoodLuck(dynamic payload)
     {
         if (payload?.Email == null || payload?.Message == null || !IsValidEmail(payload?.Email.ToString()))
@@ -221,6 +141,29 @@ public class NotificationConsumer : BackgroundService
             BackgroundJob.Schedule(() =>
                 _notificationService.SendGoodLuckEmail(notification), timeUntilSend);
         }
+    }
+
+
+    private async Task HandleStatusUpdate(dynamic payload)
+    {
+        if (payload?.Email == null || payload?.Message == null || payload?.ScheduledDate == null ||
+            !IsValidEmail(payload?.Email.ToString()))
+        {
+            Console.WriteLine($"Check: {payload?.Email}, {payload?.Message}, {payload?.ScheduledDate}");
+            Console.WriteLine("Invalid payload. Skipping...");
+            return;
+        }
+
+        var notification = new UpdateStatusNotification
+        {
+            Type = "rejected",
+            Username = payload.Username.ToString(),
+            Email = payload.Email.ToString(),
+            Message = payload.Message.ToString()
+        };
+
+        await SendNotification(notification, async () =>
+                        await _notificationService.SendUpdateStatusEmail(notification));
     }
 
     // Helper to validate email format

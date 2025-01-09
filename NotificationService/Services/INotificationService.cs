@@ -3,10 +3,8 @@ using NotificationService.Models;
 public interface INotificationService
 {
     Task SendResetPasswordEmail(ResetPasswordNotification resetPassword);
-    Task SendReminderEmail(ReminderNotification reminder);
+    Task SendUpdateStatusEmail(UpdateStatusNotification updateStatus);
     Task SendGoodLuckEmail(GoodLuckNotification goodLuck);
-    Task SendRejectedEmail(UpdateDateNotification rejected);
-    Task SendSelectedEmail(UpdateDateNotification selected);
 
 
 }

@@ -1,6 +1,6 @@
 namespace NotificationService.Models;
 
-public class UpdateDateNotification : NotificationBase
+public class UpdateStatusNotification : NotificationBase
 {
-    public DateTime? ScheduledDate { get; set; }
+    public DateTime? DateToReminder { get; set; }
 }
