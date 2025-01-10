@@ -1,24 +1,27 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace UserService.Models
+namespace JobService.Models
 {
-    public class User
+    public class Application
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; } = ObjectId.GenerateNewId().ToString();
         [BsonRepresentation(BsonType.String)]
-        public string Username { get; set; }
-        [BsonRequired]
+        public string UserId { get; set; }
         [BsonRepresentation(BsonType.String)]
         public string Email { get; set; }
-        [BsonRequired]
         [BsonRepresentation(BsonType.String)]
-        public string PasswordHash { get; set; }
+        public string Username { get; set; }
         [BsonRepresentation(BsonType.String)]
-        public string? OPT { get; set; }
+        public string? Status { get; set; } = "Applied";
         [BsonRepresentation(BsonType.DateTime)]
-        public DateTime? OPTExpiry { get; set; }
+        public DateTime? AppliedDate { get; set; } = DateTime.UtcNow;
+        [BsonRepresentation(BsonType.DateTime)]
+        public DateTime? InterviewDate { get; set; }
+        [BsonRepresentation(BsonType.String)]
+        public string? Notes { get; set; } = "";
+
     }
 }

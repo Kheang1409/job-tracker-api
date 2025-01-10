@@ -13,14 +13,39 @@ namespace JobService.Repositories
             _jobsCollection = database.GetCollection<Job>("Jobs");
         }
 
+        public async Task<IEnumerable<Job>> GetJobsAsync(int pageNumber, string status, string sort)
+        {
+            var limit = 5;
+            var skip = (pageNumber - 1) * limit;
+            var filter = Builders<Job>.Filter.Empty;
+            if (!string.IsNullOrEmpty(status))
+            {
+                filter = Builders<Job>.Filter.Eq(job => job.Status, status);
+            }
+            var sortDefinition = sort switch
+            {
+                "asc" => Builders<Job>.Sort.Ascending(job => job.CreatedDate),
+                "desc" => Builders<Job>.Sort.Descending(job => job.CreatedDate),
+                _ => Builders<Job>.Sort.Descending(job => job.CreatedDate)
+            };
+            return await _jobsCollection.Find(filter).Sort(sortDefinition).Skip(skip).Limit(limit).ToListAsync();
+        }
+
         public async Task<Job> GetJobByIdAsync(string id)
         {
             return await _jobsCollection.Find(j => j.Id == id).FirstOrDefaultAsync();
         }
 
-        public async Task<IEnumerable<Job>> GetJobsByUserIdAsync(string userId)
+        public async Task<int> GetTotalJobsCountAsync(string status)
         {
-            return await _jobsCollection.Find(j => j.UserId == userId).ToListAsync();
+            var filter = Builders<Job>.Filter.Empty;
+            if (!string.IsNullOrEmpty(status))
+            {
+                filter = Builders<Job>.Filter.Eq(job => job.Status, status);
+            }
+            var jobsTotal = await _jobsCollection.Find(filter).CountDocumentsAsync();
+
+            return (int)jobsTotal;
         }
 
         public async Task CreateJobAsync(Job job)

@@ -14,12 +14,14 @@ namespace UserService.Services
             _configuration = configuration;
         }
 
-        public string GenerateToken(string userId, string email)
+        public string GenerateToken(string userId, string email, string username)
         {
             if (string.IsNullOrEmpty(userId))
                 throw new ArgumentNullException(nameof(userId), "User ID cannot be null or empty.");
             if (string.IsNullOrEmpty(email))
                 throw new ArgumentNullException(nameof(email), "Email cannot be null or empty.");
+            if (string.IsNullOrEmpty(username))
+                throw new ArgumentNullException(nameof(username), "Username cannot be null or empty.");
 
             var jwtSettings = _configuration.GetSection("JwtSettings");
             var secretKey = jwtSettings["SecretKey"];
@@ -30,17 +32,16 @@ namespace UserService.Services
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-            // Add claims (ensure correct structure)
             var claims = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.Sub, userId),
                 new Claim(JwtRegisteredClaimNames.Email, email),
+                new Claim(JwtRegisteredClaimNames.GivenName, username),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(JwtRegisteredClaimNames.Iss, issuer),  // Explicit Issuer claim
-                new Claim(JwtRegisteredClaimNames.Aud, audience) // Explicit Audience claim
+                new Claim(JwtRegisteredClaimNames.Iss, issuer),
+                new Claim(JwtRegisteredClaimNames.Aud, audience)
             };
 
-            // Generate token
             var token = new JwtSecurityToken(
                 issuer: issuer,
                 audience: audience,

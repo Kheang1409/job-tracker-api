@@ -3,6 +3,7 @@ using JobService.Models;
 using JobService.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MongoDB.Bson;
 using System.Security.Claims;
 
 namespace JobService.Controllers
@@ -19,119 +20,124 @@ namespace JobService.Controllers
             _jobService = jobService ?? throw new ArgumentNullException(nameof(jobService));
         }
 
-        // Create a new job application
-        [HttpPost]
-        public async Task<IActionResult> CreateJob([FromBody] CreateJobDto dto)
-        {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            if (userId == null)
-            {
-                return Unauthorized("User ID not found in token.");
-            }
-
-            var job = await _jobService.CreateJobAsync(dto, userId);
-            return Ok(job);
-        }
-
-        // Fetch all jobs created by the logged-in user
+        [AllowAnonymous]
         [HttpGet]
-        public async Task<IActionResult> GetJobs()
+        public async Task<IActionResult> GetJobs([FromQuery] int? PageNumber = 1, [FromQuery] string? Status = null, [FromQuery] string? Sort = null)
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            if (string.IsNullOrEmpty(userId))
-            {
-                return Unauthorized("User ID not found in token.");
-            }
-
-            var jobs = await _jobService.GetJobsByUserIdAsync(userId);
+            var jobs = await _jobService.GetJobsAsync((int)PageNumber, Status, Sort);
             return Ok(jobs);
         }
 
-        // Fetch a specific job by ID (only if it belongs to the logged-in user)
+        [Route("totals")]
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<IActionResult> GetTotalJobsCount([FromQuery] string? Status = null)
+        {
+            var jobs = await _jobService.GetTotalJobsCountAsync(Status);
+            return Ok(jobs);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateJob([FromBody] JobDto dto)
+        {
+            var authorizationResult = IsAuthorize();
+            if (authorizationResult is IActionResult actionResult)
+            {
+                return actionResult;
+            }
+            var authorizUser = (AuthorizedUser)authorizationResult;
+            var job = await _jobService.CreateJobAsync(dto, authorizUser.UserId);
+            return Ok(job);
+        }
+
+        [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetJobById(string id)
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            if (string.IsNullOrEmpty(userId))
+            if (!ObjectId.TryParse(id, out _))
             {
-                return Unauthorized("User ID not found in token.");
+                return BadRequest("The provided ID is not a valid MongoDB ObjectId.");
             }
-
-            var job = await _jobService.GetJobByIdAsync(id, userId);
+            var job = await _jobService.GetJobByIdAsync(id);
 
             if (job == null)
             {
-                return NotFound("Job not found or does not belong to the user.");
+                return NotFound("Job not found.");
             }
 
             return Ok(job);
         }
 
-        // Update job status (only if it belongs to the logged-in user)
-        [HttpPatch("{id}/status")]
-        public async Task<IActionResult> UpdateJobStatus(string id, [FromBody] UpdateJobStatusDto dto)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> FullUpdateJob(string id, [FromBody] JobDto updateJob)
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            if (string.IsNullOrEmpty(userId))
+            var authorizationResult = IsAuthorize();
+            if (authorizationResult is IActionResult actionResult)
             {
-                return Unauthorized("User ID not found in token.");
+                return actionResult;
+            }
+            if (!ObjectId.TryParse(id, out _))
+            {
+                return BadRequest("The provided ID is not a valid MongoDB ObjectId.");
             }
 
-            var updatedJob = await _jobService.UpdateJobStatusAsync(id, dto, userId);
-
-            if (updatedJob == null)
-            {
-                return NotFound("Job not found or does not belong to the user.");
-            }
-
-            return Ok(updatedJob);
+            var authorizUser = (AuthorizedUser)authorizationResult;
+            var job = await _jobService.FullUpdateJobAsync(id, updateJob, authorizUser.UserId);
+            return Ok(job);
         }
 
-        [HttpPut("{jobId}/reminder")]
-        public async Task<IActionResult> SetInterviewReminder(string jobId, [FromBody] SetInterviewReminderDto reminderDto)
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> PartialUpdateJob(string id, [FromBody] JobDto updateJob)
         {
-            try
+            var authorizationResult = IsAuthorize();
+            if (authorizationResult is IActionResult actionResult)
             {
-                var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-
-                if (string.IsNullOrEmpty(userId))
-                {
-                    return Unauthorized("User ID not found in token.");
-                }
-
-                var job = await _jobService.GetJobByIdAsync(jobId, userId);
-                if (job == null || job.UserId != userId)
-                {
-                    return NotFound("Job not found or unauthorized access.");
-                }
-
-                await _jobService.SetInterviewReminderAsync(jobId, reminderDto, userId);
-
-                return Ok("Interview reminder has been set successfully.");
+                return actionResult;
             }
-            catch (Exception ex)
+            if (!ObjectId.TryParse(id, out _))
             {
-                return BadRequest($"Failed to set interview reminder: {ex.Message}");
+                return BadRequest("The provided ID is not a valid MongoDB ObjectId.");
             }
+
+            var authorizUser = (AuthorizedUser)authorizationResult;
+            var job = await _jobService.PartialUpdateJobAsync(id, updateJob, authorizUser.UserId);
+            return Ok(job);
         }
 
+        [HttpPut("{id}/status")]
+        public async Task<IActionResult> UpdateJobStatus(string id)
+        {
+            var authorizationResult = IsAuthorize();
+            if (authorizationResult is IActionResult actionResult)
+            {
+                return actionResult;
+            }
+            if (!ObjectId.TryParse(id, out _))
+            {
+                return BadRequest("The provided ID is not a valid MongoDB ObjectId.");
+            }
+            var authorizUser = (AuthorizedUser)authorizationResult;
+            var job = await _jobService.UpdateJobStatus(id, authorizUser.UserId);
+            return Ok(job);
+        }
 
-        // Delete a job (only if it belongs to the logged-in user)
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteJob(string id)
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            if (string.IsNullOrEmpty(userId))
+            var authorizationResult = IsAuthorize();
+            if (authorizationResult is IActionResult actionResult)
             {
-                return Unauthorized("User ID not found in token.");
+                return actionResult;
+            }
+            if (!ObjectId.TryParse(id, out _))
+            {
+                return BadRequest("The provided ID is not a valid MongoDB ObjectId.");
             }
 
-            var deleted = await _jobService.DeleteJobAsync(id, userId);
+            var authorizUser = (AuthorizedUser)authorizationResult;
+
+            var deleted = await _jobService.DeleteJobAsync(id, authorizUser.UserId);
 
             if (!deleted)
             {
@@ -139,6 +145,25 @@ namespace JobService.Controllers
             }
 
             return NoContent();
+        }
+
+        private object IsAuthorize()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var email = User.FindFirst(ClaimTypes.Email)?.Value;
+            var username = User.FindFirst(ClaimTypes.GivenName)?.Value;
+
+            var authorizUser = new AuthorizedUser();
+            authorizUser.UserId = userId;
+            authorizUser.Email = email;
+            authorizUser.Username = username;
+
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized("User ID not found in token.");
+            }
+            return authorizUser;
         }
     }
 }

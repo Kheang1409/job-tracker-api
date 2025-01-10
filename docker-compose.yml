@@ -40,10 +40,11 @@ services:
       context: ./NotificationService
       dockerfile: Dockerfile
     ports:
-      - "5001:5001" # Exposing NotificationService on port 5001
+      - "5001:5001"
     environment:
       - DOTNET_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://0.0.0.0:5001
+      - MongoDB__ConnectionString=null
     depends_on:
       - kafka
     networks:
@@ -54,11 +55,11 @@ services:
       context: ./JobService
       dockerfile: Dockerfile
     ports:
-      - "5002:5002" # Exposing JobService on port 5002
+      - "5002:5002"
     environment:
       - DOTNET_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://0.0.0.0:5002
-      - MongoDB__ConnectionString=mongodb+srv://Kai:YXSiHJhJEw7lo4zG@cluster0.6dn33.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+      - MongoDB__ConnectionString=null
     depends_on:
       - kafka
     networks:
@@ -69,11 +70,11 @@ services:
       context: ./UserService
       dockerfile: Dockerfile
     ports:
-      - "5000:5000" # Exposing UserService on port 5000
+      - "5000:5000"
     environment:
       - DOTNET_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://0.0.0.0:5000
-      - MongoDB__ConnectionString=mongodb+srv://Kai:YXSiHJhJEw7lo4zG@cluster0.6dn33.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+      - MongoDB__ConnectionString=null
     networks:
       - app-network
 

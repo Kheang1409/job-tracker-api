@@ -10,7 +10,7 @@ using UserService.Kafka;
 namespace UserService.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/users")]
     public class UserController : ControllerBase
     {
         private readonly IUserRepository _userRepository;
@@ -24,88 +24,106 @@ namespace UserService.Controllers
             _kafkaProducer = kafkaProducer;
         }
 
-        [HttpPost("register")]
-        public async Task<IActionResult> Register(RegisterUserDto dto)
+        [HttpPost]
+        public async Task<IActionResult> Register(RegisterDto dto)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new { message = "Invalid input", errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList() });
+            }
+
             if (await _userRepository.GetByEmailAsync(dto.Email) != null)
             {
-                return BadRequest("Email is already registered.");
+                return BadRequest(new { message = "Email is already registered!", statusCode = 400 });
             }
 
             var user = new User
             {
+                Username = dto.Username,
                 Email = dto.Email,
                 PasswordHash = HashPassword(dto.Password)
             };
 
             await _userRepository.AddUserAsync(user);
-            return Ok("User registered successfully.");
+
+            return Ok(user);
         }
 
         [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgetPasswordDto forgetPasswordDto)
         {
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new { message = "Invalid input", errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList() });
+            }
+
             var email = forgetPasswordDto.Email;
             var user = await _userRepository.GetByEmailAsync(email);
             if (user == null)
                 return BadRequest("Email not registered.");
 
-            var resetToken = GenerateResetToken();
-            var expiry = DateTime.UtcNow.AddMinutes(60);
-
-            await _userRepository.UpdateResetTokenAsync(email, resetToken, expiry);
-
-            var baseUrl = "https://improved-palm-tree-j46j575qpj6cvj6-5000.app.github.dev";
-            var resetLink = $"{baseUrl}/api/user/reset-password/{resetToken}";
+            var otp = GenerateOtp();
+            var expiry = DateTime.UtcNow.AddMinutes(3);
+            await _userRepository.UpdateOPTAsync(email, otp, expiry);
 
             var notificationPayload = new
             {
                 Type = "resetPassword",
                 Email = email,
-                ResetLink = resetLink
+                Otp = otp
             };
 
             _kafkaProducer.Produce("job-topic", Guid.NewGuid().ToString(), notificationPayload);
 
-            return Ok("Reset link has been sent to your email.");
+            return Ok("OTP has been sent to your email.");
         }
 
 
 
-        [HttpPost("reset-password/{token}")]
-        public async Task<IActionResult> ResetPassword(string token, ResetPasswordDto dto)
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword(ResetPasswordDto dto)
         {
-            var user = await _userRepository.GetByResetTokenAsync(token);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new { message = "Invalid input", errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList() });
+            }
+
+            var user = await _userRepository.GetByOPTAsync(dto.Otp);
             if (user == null)
-                return BadRequest("Invalid or expired reset token.");
+                return BadRequest(new { message = "Invalid or expired OTP.", statusCode = 400 });
 
             user.PasswordHash = HashPassword(dto.NewPassword);
-            user.ResetToken = string.Empty;
-            user.ResetTokenExpiry = null;
+            user.OPT = string.Empty;
+            user.OPTExpiry = null;
 
             await _userRepository.UpdateUserAsync(user);
+
             return Ok("Password reset successfully.");
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] RegisterUserDto dto)
+        public async Task<IActionResult> Login([FromBody] LoginDto dto)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new { message = "Invalid input", errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList() });
+            }
+
             var user = await _userRepository.GetByEmailAsync(dto.Email);
             if (user == null || !VerifyPassword(dto.Password, user.PasswordHash))
             {
-                return Unauthorized("Invalid email or password.");
+                return Unauthorized(new { message = "Invalid email or password." });
             }
 
-            var token = _jwtService.GenerateToken(user.Id, user.Email);
+            var token = _jwtService.GenerateToken(user.Id, user.Email, user.Username);
             return Ok(new { Token = token });
         }
 
-        private static string GenerateResetToken()
+        private static string GenerateOtp()
         {
-            using var rng = RandomNumberGenerator.Create();
-            var bytes = new byte[32];
-            rng.GetBytes(bytes);
-            return Convert.ToBase64String(bytes);
+            var random = new Random();
+            return random.Next(100000, 999999).ToString();
         }
 
         private static string HashPassword(string password)
