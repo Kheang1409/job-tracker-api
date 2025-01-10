@@ -161,13 +161,12 @@ public class JobService : IJobService
         existApplication.Status = statusDto.Status;
         existApplication.Notes = statusDto.Notes;
 
-
         var emailNotification = new EmailNotification
         {
             JobId = jobId,
             Username = existApplication.Username,
             Email = existApplication.Email,
-            ScheduledDate = existApplication.InterviewDate.Value.Date,
+            ScheduledDate = statusDto.DateToRemeber.Value.Date,
             Type = "statusUpdate",
             Message = ""
         };
@@ -176,7 +175,6 @@ public class JobService : IJobService
         {
 
             existApplication.InterviewDate = statusDto.DateToRemeber;
-
             emailNotification.Message = $"Dear {existApplication.Username},\n\n" +
             $"We are pleased to inform you that your interview for the position of '{job.Title}' at '{job.Company}' is scheduled for {existApplication.InterviewDate.Value:MMMM dd, yyyy} at {existApplication.InterviewDate.Value:hh:mm tt}.\n\n" +
             "Please make sure to be prepared and arrive on time. If you have any questions or require further assistance, don't hesitate to reach out to us.\n\n" +
