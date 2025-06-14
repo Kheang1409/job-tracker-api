@@ -22,8 +22,8 @@ public class User
     public string OTP { get; private set; } = string.Empty;
     public DateTime ExpireDate { get; private set; }
     public UserRole Role { get; private set; }
-    public DateTime CreatedDate { get; private set; }
-    public DateTime ModifiedDate { get; private set; }
+    public DateTime CreatedAt { get; private set; }
+    public DateTime ModifiedAt { get; private set; }
     public List<Skill> Skills { get; private set; } = new();
     public List<Experience> Experiences { get; private set; } = new();
     public List<Project> Projects { get; private set; } = new();
@@ -35,7 +35,7 @@ public class User
         Email = email;
         PasswordHash = Hash(password);
         Role = role;
-        CreatedDate = DateTime.UtcNow;
+        CreatedAt = DateTime.UtcNow;
     }
 
     public static User Create(string email, string password, UserRole role)
@@ -54,7 +54,7 @@ public class User
         Email = email;
         CountryCode = countryCode;
         PhoneNumber = phoneNumber;
-        ModifiedDate = DateTime.UtcNow;
+        ModifiedAt = DateTime.UtcNow;
     }
 
     public static string NormalizePhoneNumber(string phone)
