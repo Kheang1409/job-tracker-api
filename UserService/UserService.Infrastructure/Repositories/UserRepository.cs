@@ -89,9 +89,9 @@ public class UserRepository : IUserRepository
         return true;
     }
 
-    public async Task<bool> DeleteAsync(string id)
+    public async Task<bool> DeleteAsync(string Id)
     {
-        var deletedUser = await _users.FindOneAndDeleteAsync(u => u.Id == id);
+        var deletedUser = await _users.FindOneAndDeleteAsync(u => u.Id == Id);
         return deletedUser != null;
     }
 }
