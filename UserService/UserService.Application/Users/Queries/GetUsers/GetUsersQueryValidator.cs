@@ -11,12 +11,7 @@ public class GetUsersQueryValidator : AbstractValidator<GetUsersQuery>
             .NotEmpty().WithMessage("Limit is required.")
             .GreaterThanOrEqualTo(1).WithMessage("Limit must greater than or equal 1");
         RuleFor(x => x.PageNumber)
-            .NotEmpty().WithMessage("Limit is required.")
-            .GreaterThanOrEqualTo(1).WithMessage("Limit must greater than or equal 1");
-    }
-
-    private bool BeAValidObjectId(string id)
-    {
-        return ObjectId.TryParse(id, out _);
+            .NotEmpty().WithMessage("Page number is required.")
+            .GreaterThanOrEqualTo(1).WithMessage("Page number must greater than or equal 1");
     }
 }
