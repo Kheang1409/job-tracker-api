@@ -1,5 +1,4 @@
 using FluentValidation;
-using MongoDB.Bson;
 
 namespace JobTracker.UserService.Application.Users.Queries.GetUsers;
 

@@ -9,11 +9,11 @@ public class DeleteSkillCommandValidator : AbstractValidator<DeleteSkillCommand>
     {
         RuleFor(x => x.UserId)
             .NotEmpty().WithMessage("User Id is required.")
-            .Must(BeAValidObjectId).WithMessage("Id must be a valid MongoDB ObjectId.");
+            .Must(BeAValidObjectId).WithMessage("User id must be a valid MongoDB ObjectId.");
 
         RuleFor(x => x.SkillId)
             .NotEmpty().WithMessage("Skill Id is required.")
-            .Must(BeAValidObjectId).WithMessage("Id must be a valid MongoDB ObjectId.");
+            .Must(BeAValidObjectId).WithMessage("Skill id must be a valid MongoDB ObjectId.");
     }
 
     private bool BeAValidObjectId(string id)
