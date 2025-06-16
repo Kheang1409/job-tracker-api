@@ -1,6 +1,6 @@
-using JobTracker.UserService.Application.Users.Commands.ForgotPassword;
-using JobTracker.UserService.Application.Users.Commands.ResetPassword;
-using JobTracker.UserService.Application.Users.Commands.Login;
+using JobTracker.UserService.Application.Auths.Commands.ForgotPassword;
+using JobTracker.UserService.Application.Auths.Commands.ResetPassword;
+using JobTracker.UserService.Application.Auths.Commands.Login;
 
 using Microsoft.AspNetCore.Mvc;
 using MediatR;

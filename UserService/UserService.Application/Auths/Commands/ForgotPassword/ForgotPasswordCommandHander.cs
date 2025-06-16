@@ -2,7 +2,7 @@ using JobTracker.UserService.Application.Infrastructure.Messaging;
 using JobTracker.UserService.Application.Repositories;
 using MediatR;
 
-namespace JobTracker.UserService.Application.Users.Commands.ForgotPassword;
+namespace JobTracker.UserService.Application.Auths.Commands.ForgotPassword;
 
 public class ForgotPasswordCommandHandler : IRequestHandler<ForgotPasswordCommand, bool>
 {
@@ -26,13 +26,13 @@ public class ForgotPasswordCommandHandler : IRequestHandler<ForgotPasswordComman
         existingUser.ForgotPassword();
         var notificationPayload = new
             {
-                Type = "Reset Password",
+                Type = "Auth",
                 existingUser.Email,
                 existingUser.OTP
             };
         await Task.WhenAll(
             _userRepository.UpdateAsync(existingUser),
-            _kafkaProducer.Produce("user-topic", Guid.NewGuid().ToString(), notificationPayload)
+            _kafkaProducer.Produce("job-tracker-topic", Guid.NewGuid().ToString(), notificationPayload)
         );
         return true;
     }

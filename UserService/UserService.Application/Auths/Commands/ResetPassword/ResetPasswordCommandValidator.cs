@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace JobTracker.UserService.Application.Users.Commands.ResetPassword;
+namespace JobTracker.UserService.Application.Auths.Commands.ResetPassword;
 
 public class ResetPasswordCommandValidator : AbstractValidator<ResetPasswordCommand>
 {

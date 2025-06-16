@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace JobTracker.UserService.Application.Users.Commands.ForgotPassword;
+namespace JobTracker.UserService.Application.Auths.Commands.ForgotPassword;
 
 public class ForgotPasswordCommandValidator : AbstractValidator<ForgotPasswordCommand>
 {

@@ -2,7 +2,7 @@ using JobTracker.UserService.Application.Repositories;
 using JobTracker.UserService.Application.Services;
 using MediatR;
 
-namespace JobTracker.UserService.Application.Users.Commands.Login;
+namespace JobTracker.UserService.Application.Auths.Commands.Login;
 
 public class LoginCommandHandler : IRequestHandler<LoginCommand, string>
 {

@@ -1,7 +1,7 @@
 using JobTracker.UserService.Application.Repositories;
 using MediatR;
 
-namespace JobTracker.UserService.Application.Users.Commands.ResetPassword;
+namespace JobTracker.UserService.Application.Auths.Commands.ResetPassword;
 
 public class ResetPasswordCommandHandler : IRequestHandler<ResetPasswordCommand, bool>
 {
