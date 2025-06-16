@@ -9,15 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobService", "JobService\Jo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationService", "NotificationService\NotificationService.csproj", "{0EA3F505-9C81-42D2-96B2-40EB7AD31760}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "Shared\Shared.csproj", "{B24E70D3-BAB5-413D-9AAD-608FF2AFEE83}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{D5468B7A-8F33-485E-A325-DDA8F38F1B3C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -32,9 +27,8 @@ Global
 		{0EA3F505-9C81-42D2-96B2-40EB7AD31760}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0EA3F505-9C81-42D2-96B2-40EB7AD31760}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0EA3F505-9C81-42D2-96B2-40EB7AD31760}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B24E70D3-BAB5-413D-9AAD-608FF2AFEE83}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B24E70D3-BAB5-413D-9AAD-608FF2AFEE83}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B24E70D3-BAB5-413D-9AAD-608FF2AFEE83}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B24E70D3-BAB5-413D-9AAD-608FF2AFEE83}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 EndGlobal
