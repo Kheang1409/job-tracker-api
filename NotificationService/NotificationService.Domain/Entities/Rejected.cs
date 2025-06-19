@@ -1,11 +1,11 @@
 namespace JobTracker.NotificationService.Domain.Entities;
 
-public class Applied : EmailBase
+public class Rejected : EmailBase
 {
     public string Title { get; private set; } = string.Empty;
     public string CompanyName { get; private set; } = string.Empty;
 
-    private Applied(string recipient,
+    private Rejected(string recipient,
         string subject,
         string firstname,
         string title,
@@ -16,14 +16,14 @@ public class Applied : EmailBase
         CompanyName = companyName;
     }
 
-    public static Applied Create(
+    public static Rejected Create(
         string recipient,
         string subject,
         string firstname,
         string title,
         string companyName)
     {
-        return new Applied(recipient, subject, firstname, title, companyName);
+        return new Rejected(recipient, subject, firstname, title, companyName);
     }
     public override string Message()
     {
@@ -67,11 +67,12 @@ public class Applied : EmailBase
                         <img src='https://kheang1409.github.io/jobtracker-assets/logo.png' alt='JobTracker Logo' width='120'/>
                     </div>
                     <p>Dear {FirstName},</p>
-                    <p>Thank you for applying for the position of <span class='job-title'>{Title}</span> at <strong>{CompanyName}</strong>.</p>
-                    <p>We have received your application and our team is currently reviewing your qualifications.</p>
-                    <p>If your profile matches our requirements, we will contact you for the next steps in the process.</p>
-                    <p>We appreciate your interest in joining our team.</p>
-                    <p>Best regards,<br/>The JobTracker Team</p>
+                    <p>Thank you for taking the time to apply for the position of <span class='job-title'>{Title}</span> at <strong>{CompanyName}</strong>.</p>
+                    <p>After careful consideration, we regret to inform you that we have decided to move forward with other candidates at this time.</p>
+                    <p>This decision was not easy, as we truly appreciate the effort you put into your application. Please know that your interest in <strong>{CompanyName}</strong> is valued and respected.</p>
+                    <p>We encourage you to keep pursuing your career goals and invite you to apply again in the future as new opportunities arise.</p>
+                    <p>Wishing you all the best in your job search and future endeavors.</p>
+                    <p>Sincerely,<br/>The JobTracker Team</p>
                     <div class='footer'>
                         &copy; {(DateTime.UtcNow.Year)} JobTracker. All rights reserved.
                     </div>

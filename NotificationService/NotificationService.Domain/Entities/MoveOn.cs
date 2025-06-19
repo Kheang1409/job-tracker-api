@@ -1,29 +1,36 @@
 namespace JobTracker.NotificationService.Domain.Entities;
 
-public class Applied : EmailBase
+public class MoveOn : EmailBase
 {
     public string Title { get; private set; } = string.Empty;
     public string CompanyName { get; private set; } = string.Empty;
-
-    private Applied(string recipient,
+    public string Stage { get; private set; } = string.Empty;
+    public DateTime AppointmentDate { get; private set; }
+    private MoveOn(string recipient,
         string subject,
         string firstname,
         string title,
-        string companyName)
+        string companyName,
+        string stage,
+        DateTime appointmentDate)
         : base(recipient, subject, firstname)
     {
         Title = title;
         CompanyName = companyName;
+        Stage = stage;
+        AppointmentDate = appointmentDate;
     }
 
-    public static Applied Create(
+    public static MoveOn Create(
         string recipient,
         string subject,
         string firstname,
         string title,
-        string companyName)
+        string companyName,
+        string stage,
+        DateTime appointmentDate)
     {
-        return new Applied(recipient, subject, firstname, title, companyName);
+        return new MoveOn(recipient, subject, firstname, title, companyName, stage, appointmentDate);
     }
     public override string Message()
     {
@@ -59,6 +66,10 @@ public class Applied : EmailBase
                         font-weight: bold;
                         color: #004aad;
                     }}
+                    .highlight {{
+                        font-weight: bold;
+                        color: #007b00;
+                    }}
                 </style>
             </head>
             <body>
@@ -67,10 +78,12 @@ public class Applied : EmailBase
                         <img src='https://kheang1409.github.io/jobtracker-assets/logo.png' alt='JobTracker Logo' width='120'/>
                     </div>
                     <p>Dear {FirstName},</p>
-                    <p>Thank you for applying for the position of <span class='job-title'>{Title}</span> at <strong>{CompanyName}</strong>.</p>
-                    <p>We have received your application and our team is currently reviewing your qualifications.</p>
-                    <p>If your profile matches our requirements, we will contact you for the next steps in the process.</p>
-                    <p>We appreciate your interest in joining our team.</p>
+                    <p>We are pleased to inform you that you have <span class='highlight'>successfully cleared</span> the previous round for the position of 
+                    <span class='job-title'>{Title}</span> at <strong>{CompanyName}</strong>.</p>
+                    <p>Congratulations!</p>
+                    <p>You are now moving forward to the next stage of the hiring process: <strong>{Stage}</strong>.</p>
+                    <p>Please be prepared and available on <strong>{AppointmentDate:dddd, MMMM dd, yyyy 'at' hh:mm tt}</strong>.</p>
+                    <p>Further details will be shared with you soon. Stay sharp and good luck!</p>
                     <p>Best regards,<br/>The JobTracker Team</p>
                     <div class='footer'>
                         &copy; {(DateTime.UtcNow.Year)} JobTracker. All rights reserved.

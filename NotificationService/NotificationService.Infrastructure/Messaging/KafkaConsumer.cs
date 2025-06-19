@@ -32,7 +32,6 @@ public class KafkaConsumer : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        Console.WriteLine("Starting Kafka Consumer...");
         _consumer.Subscribe("job-tracker-topic");
 
         while (!stoppingToken.IsCancellationRequested)
@@ -46,8 +45,13 @@ public class KafkaConsumer : BackgroundService
                     if (payload.Type.ToString() == "Auth")
                         await HandleResetPassword(payload);
                     if (payload.Type.ToString() == "Applied")
-                        await HandleResetPassword(payload);
-                    
+                        await HandleApplied(payload);
+                    if (payload.Type.ToString() == "Move On")
+                        await HandleMoveOn(payload);
+                    if (payload.Type.ToString() == "Rejected")
+                        await HandleRejected(payload);
+                    if (payload.Type.ToString() == "Selected")
+                        await HandleSelected(payload);
                 }
             }
         }
@@ -58,11 +62,11 @@ public class KafkaConsumer : BackgroundService
     {
         var recipient = payload.Email?.ToString();
         var otp = payload.OTP?.ToString();
-        var firstname = payload.Firstname?.ToString();
+        var firstName = payload.FirstName?.ToString();
         var notification = ResetPassword.Create(
             recipient,
             "JobTracker Password Reset Request",
-            firstname,
+            firstName,
             otp
         );
 
@@ -72,13 +76,69 @@ public class KafkaConsumer : BackgroundService
     private async Task HandleApplied(dynamic payload)
     {
         var recipient = payload.Email?.ToString();
-        var firstname = payload.Firstname?.ToString();
+        var firstName = payload.FirstName?.ToString();
         var title = payload.Title?.ToString();
         var companyName = payload.CompanyName?.ToString();
         var notification = Applied.Create(
             recipient,
             $"Application Received for {title} at {companyName}",
-            firstname,
+            firstName,
+            title,
+            companyName
+        );
+
+        await _emailService.Send(notification);
+    }
+
+    private async Task HandleMoveOn(dynamic payload)
+    {
+        Console.WriteLine(payload);
+        var recipient = payload.Email?.ToString();
+        var firstName = payload.FirstName?.ToString();
+        var title = payload.Title?.ToString();
+        var companyName = payload.CompanyName?.ToString();
+        var stage = payload.Stage?.ToString();
+        DateTime appointmentDate = payload.AppointmentDate?.Value;
+        var notification = MoveOn.Create(
+            recipient,
+            $"Great News! You're Moving Ahead at {companyName}",
+            firstName,
+            title,
+            companyName,
+            stage,
+            appointmentDate
+        );
+
+        await _emailService.Send(notification);
+    }
+
+    private async Task HandleRejected(dynamic payload)
+    {
+        var recipient = payload.Email?.ToString();
+        var firstName = payload.FirstName?.ToString();
+        var title = payload.Title?.ToString();
+        var companyName = payload.CompanyName?.ToString();
+        var notification = Rejected.Create(
+            recipient,
+            $"Update on Your Application for {title} at {companyName}",
+            firstName,
+            title,
+            companyName
+        );
+
+        await _emailService.Send(notification);
+    }
+
+    private async Task HandleSelected(dynamic payload)
+    {
+        var recipient = payload.Email?.ToString();
+        var firstName = payload.FirstName?.ToString();
+        var title = payload.Title?.ToString();
+        var companyName = payload.CompanyName?.ToString();
+        var notification = Selected.Create(
+            recipient,
+            $"You're Selected for the {title} Position at {companyName}!", //title
+            firstName,
             title,
             companyName
         );

@@ -1,11 +1,11 @@
 namespace JobTracker.NotificationService.Domain.Entities;
 
-public class Applied : EmailBase
+public class Selected : EmailBase
 {
     public string Title { get; private set; } = string.Empty;
     public string CompanyName { get; private set; } = string.Empty;
 
-    private Applied(string recipient,
+    private Selected(string recipient,
         string subject,
         string firstname,
         string title,
@@ -16,14 +16,14 @@ public class Applied : EmailBase
         CompanyName = companyName;
     }
 
-    public static Applied Create(
+    public static Selected Create(
         string recipient,
         string subject,
         string firstname,
         string title,
         string companyName)
     {
-        return new Applied(recipient, subject, firstname, title, companyName);
+        return new Selected(recipient, subject, firstname, title, companyName);
     }
     public override string Message()
     {
@@ -67,11 +67,12 @@ public class Applied : EmailBase
                         <img src='https://kheang1409.github.io/jobtracker-assets/logo.png' alt='JobTracker Logo' width='120'/>
                     </div>
                     <p>Dear {FirstName},</p>
-                    <p>Thank you for applying for the position of <span class='job-title'>{Title}</span> at <strong>{CompanyName}</strong>.</p>
-                    <p>We have received your application and our team is currently reviewing your qualifications.</p>
-                    <p>If your profile matches our requirements, we will contact you for the next steps in the process.</p>
-                    <p>We appreciate your interest in joining our team.</p>
-                    <p>Best regards,<br/>The JobTracker Team</p>
+                    <p>We are thrilled to inform you that you have been <strong>selected</strong> for the position of 
+                    <span class='job-title'>{Title}</span> at <strong>{CompanyName}</strong>!</p>
+                    <p>Your experience and qualifications stood out among the many applicants, and we are excited about the potential you bring to our team.</p>
+                    <p>Our HR department will reach out to you shortly with details regarding the next steps in the onboarding process, including any necessary documentation and start dates.</p>
+                    <p>Welcome aboard — we look forward to working with you and supporting your journey at <strong>{CompanyName}</strong>.</p>
+                    <p>Warm regards,<br/>The JobTracker Team</p>
                     <div class='footer'>
                         &copy; {(DateTime.UtcNow.Year)} JobTracker. All rights reserved.
                     </div>

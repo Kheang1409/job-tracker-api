@@ -2,12 +2,8 @@ using MimeKit;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using MimeKit.Text;
-using Microsoft.Extensions.Options;
 using JobTracker.NotificationService.Application.Services;
 using JobTracker.NotificationService.Domain.Entities;
-using MongoDB.Bson;
-using Microsoft.Extensions.Configuration;
-using Org.BouncyCastle.Utilities;
 
 namespace JobTracker.NotificationService.Infrastructure.Services;
 
@@ -28,7 +24,7 @@ public class EmailService : IEmailService
             message.From.Add(new MailboxAddress("JobTrackerApp", _emailSettings.SenderEmail));
             message.To.Add(new MailboxAddress(Email.Recipient, Email.Recipient));
             message.Subject = Email.Subject;
-            message.Body = new TextPart(TextFormat.Plain) { Text = Email.Message() };
+            message.Body = new TextPart(TextFormat.Html) { Text = Email.Message() };
             await SendEmailAsync(message);
         }
         catch (Exception)
