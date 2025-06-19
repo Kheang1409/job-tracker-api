@@ -1,15 +1,13 @@
-
-
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
-using MediatR;
-
 using JobTracker.UserService.Application.Projects.Queries.GetProjects;
 using JobTracker.UserService.Application.Projects.Queries.GetProject;
 using JobTracker.UserService.Application.Projects.Commands.CreateProject;
 using JobTracker.UserService.Application.Projects.Commands.UpdateProject;
 using JobTracker.UserService.Application.Projects.Commands.DeleteProject;
+
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
+using MediatR;
 
 namespace JobTracker.UserService.API.Controllers;
 
@@ -71,7 +69,7 @@ public class ProjectController : ControllerBase
             command.About,
             command.StartDate,
             command.EndDate);
-            
+
         await _mediator.Send(commandWithId);
         return NoContent();
     }

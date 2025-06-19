@@ -3,9 +3,9 @@ using JobTracker.UserService.Application.Users.Queries.GetUsers;
 using JobTracker.UserService.Application.Users.Commands.CreateUser;
 using JobTracker.UserService.Application.Users.Commands.DeleteUser;
 using JobTracker.UserService.Application.Users.Commands.UpdateUser;
+
 using JobTracker.UserService.Application.DTOs;
 using Microsoft.AspNetCore.Authorization;
-using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using MediatR;
