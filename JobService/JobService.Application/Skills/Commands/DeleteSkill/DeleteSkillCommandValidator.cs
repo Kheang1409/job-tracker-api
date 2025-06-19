@@ -7,7 +7,7 @@ public class DeleteSkillCommandValidator : AbstractValidator<DeleteSkillCommand>
 {
     public DeleteSkillCommandValidator()
     {
-        RuleFor(x => x.UserId)
+        RuleFor(x => x.AuthorId)
             .NotEmpty().WithMessage("User Id is required.")
             .Must(BeAValidObjectId).WithMessage("User id must be a valid MongoDB ObjectId.");
 

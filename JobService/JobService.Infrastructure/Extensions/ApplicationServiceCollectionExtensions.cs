@@ -12,6 +12,13 @@ using JobTracker.JobService.Application.Skills.Commands.CreateSkill;
 using JobTracker.JobService.Application.Skills.Commands.DeleteSkill;
 using JobTracker.JobService.Application.Skills.Queries.GetSkill;
 using JobTracker.JobService.Application.Skills.Queries.GetSkills;
+using JobTracker.JobService.Application.Candidates.Applied.Commands;
+using JobTracker.JobService.Application.Candidates.Queries.GetCandidate;
+using JobTracker.JobService.Application.Candidates.Queries.GetCandidates;
+using JobTracker.JobService.Application.Candidates.Withdraw.Commands;
+using JobTracker.JobService.Application.Candidates.MoveOn.Commands;
+using JobTracker.JobService.Application.Candidates.Rejected.Commands;
+using JobTracker.JobService.Application.Candidates.Selected.Commands;
 
 namespace JobTracker.JobService.Infrastructure.Extensions;
 
@@ -39,7 +46,16 @@ public static class ApplicationServiceCollectionExtensions
             cfg.RegisterServicesFromAssemblyContaining<GetSkillQuery>();
             cfg.RegisterServicesFromAssemblyContaining<GetSkillsQuery>();
 
+            //Candidates
+            cfg.RegisterServicesFromAssemblyContaining<AppliedCommand>();
+            cfg.RegisterServicesFromAssemblyContaining<WithdrawCommand>();
+            cfg.RegisterServicesFromAssemblyContaining<MoveOnCommand>();
+            cfg.RegisterServicesFromAssemblyContaining<RejectedCommand>();
+            cfg.RegisterServicesFromAssemblyContaining<SelectedCommand>();
+            
 
+            cfg.RegisterServicesFromAssemblyContaining<GetCandidateQuery>();
+            cfg.RegisterServicesFromAssemblyContaining<GetCandidatesQuery>();
 
         });
 
@@ -56,6 +72,15 @@ public static class ApplicationServiceCollectionExtensions
         services.AddValidatorsFromAssemblyContaining<DeleteSkillCommandValidator>();
         services.AddValidatorsFromAssemblyContaining<GetSkillQueryValidator>();
         services.AddValidatorsFromAssemblyContaining<GetSkillsQueryValidator>();
+
+        //Candidate
+        services.AddValidatorsFromAssemblyContaining<AppliedCommandValidator>();
+        services.AddValidatorsFromAssemblyContaining<WithdrawCommandValidator>();
+        services.AddValidatorsFromAssemblyContaining<MoveOnCommandValidator>();
+        services.AddValidatorsFromAssemblyContaining<RejectedCommandValidator>();
+        services.AddValidatorsFromAssemblyContaining<SelectedCommandValidator>();
+        services.AddValidatorsFromAssemblyContaining<GetCandidateQueryValidator>();
+        services.AddValidatorsFromAssemblyContaining<GetCandidatesQueryValidator>();
         
 
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));

@@ -18,7 +18,7 @@ public class DeleteJobPostCommandHandler : IRequestHandler<DeleteJobPostCommand,
         var jobPosting = await _jobPostRepository.GetByIdAsync(command.JobPostId);
         if (jobPosting is null)
             throw new NotFoundException("Job posting not found");
-        if(jobPosting.AutherId != command.UserId)
+        if(jobPosting.AutherId != command.AuthorId)
             throw new UnauthorizedAccessException();
         return await _jobPostRepository.DeleteAsync(command.JobPostId);
     }

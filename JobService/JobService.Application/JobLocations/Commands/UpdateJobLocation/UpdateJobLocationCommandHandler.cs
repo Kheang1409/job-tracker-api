@@ -17,7 +17,7 @@ public class UpdateJobLocationCommandHandler : IRequestHandler<UpdateJobLocation
     public async Task<bool> Handle(UpdateJobLocationWithIdCommand command, CancellationToken cancellationToken)
     {
         var updateJobPosting = await _jobPostRepository.GetByIdAsync(command.JobPostId);
-        if(updateJobPosting.AutherId != command.UserId)
+        if(updateJobPosting.AutherId != command.AuthorId)
             throw new UnauthorizedAccessException();
         updateJobPosting.JobLocation?.Update(
             command.Address,

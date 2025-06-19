@@ -1,9 +1,9 @@
 namespace JobTracker.JobService.Domain.Enums;
 
-public enum Status
+public enum JobPostStatus
 {
     Draft,
-    Open,
+    Active,
     Closed,
     Expired,
     Reposted

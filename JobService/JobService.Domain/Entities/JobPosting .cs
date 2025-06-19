@@ -20,7 +20,8 @@ public class JobPosting
     public List<Skill> RequiredSkills { get; private set; } = new();
     public string JobDescription { get; private set; } = string.Empty;
     public Location? JobLocation { get; private set; }
-    public Status Status { get; private set; }
+    public List<Candidate> Candidates { get; private set; } = new();
+    public JobPostStatus Status { get; private set; }
     public DateTime CreatedAt { get; private set; }
     public DateTime UpdatedAt { get; private set; }
     public DateTime ExpirationDate { get; private set; }
@@ -38,7 +39,7 @@ public class JobPosting
         List<Skill> requiredSkills,
         string jobDescription,
         Location jobLocation,
-        Status status
+        JobPostStatus status
     )
     {
         Id = ObjectId.GenerateNewId().ToString();
@@ -68,7 +69,7 @@ public class JobPosting
         List<Skill> requiredSkills,
         string jobDescription,
         Location jobLocation,
-        Status status
+        JobPostStatus status
     )
     {
         return new JobPosting(
@@ -101,7 +102,7 @@ public class JobPosting
         UpdatedAt = DateTime.UtcNow;
     }
 
-    public void UpdateStatus(Status status)
+    public void UpdateStatus(JobPostStatus status)
     {
         Status = status;
     }

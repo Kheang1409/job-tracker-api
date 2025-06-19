@@ -17,11 +17,11 @@ public class EnumParser
         }
     }
 
-    public static Status Status(string input)
+    public static JobPostStatus Status(string input)
     {
         try
         {
-            return (Status)Enum.Parse(typeof(Status), input, true);
+            return (JobPostStatus)Enum.Parse(typeof(JobPostStatus), input, true);
         }
         catch (ArgumentException)
         {
@@ -45,7 +45,7 @@ public class EnumParser
     {
         try
         {
-            return (EmploymentType)Enum.Parse(typeof(WorkMode), input, true);
+            return (EmploymentType)Enum.Parse(typeof(EmploymentType), input, true);
         }
         catch (ArgumentException)
         {

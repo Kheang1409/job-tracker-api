@@ -1,4 +1,3 @@
-using JobTracker.JobService.Domain.Enums;
 using JobTracker.JobService.Domain.Entities;
 using JobTracker.JobService.Domain.Factories;
 using JobTracker.JobService.Domain.Commons;

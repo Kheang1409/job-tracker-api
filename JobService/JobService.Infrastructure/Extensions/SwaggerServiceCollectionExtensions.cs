@@ -9,7 +9,7 @@ public static class SwaggerServiceCollectionExtensions
     {
         services.AddSwaggerGen(c =>
         {
-            c.SwaggerDoc("v1", new() { Title = "User API", Version = "v1" });
+            c.SwaggerDoc("v1", new() { Title = "Job API", Version = "v1" });
 
             c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {

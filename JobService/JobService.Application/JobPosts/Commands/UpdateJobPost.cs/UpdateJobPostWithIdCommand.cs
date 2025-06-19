@@ -3,7 +3,7 @@ using MediatR;
 namespace JobTracker.JobService.Application.JobLocations.Commands.UpdateJobPost;
 
 public record UpdateJobPostWithIdCommand(
-    string UserId,
+    string AuthorId,
     string JobPostId,
     string Title,
     string CompanyName,

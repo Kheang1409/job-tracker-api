@@ -7,9 +7,9 @@ public class DeleteJobPostCommandValidator : AbstractValidator<DeleteJobPostComm
 {
     public DeleteJobPostCommandValidator()
     {
-        RuleFor(x => x.UserId)
-            .NotEmpty().WithMessage("User Id is required.")
-            .Must(BeAValidObjectId).WithMessage("User id must be a valid MongoDB ObjectId.");
+        RuleFor(x => x.AuthorId)
+            .NotEmpty().WithMessage("Author Id is required.")
+            .Must(BeAValidObjectId).WithMessage("Author id must be a valid MongoDB ObjectId.");
 
         RuleFor(x => x.JobPostId)
             .NotEmpty().WithMessage("Job post Id is required.")

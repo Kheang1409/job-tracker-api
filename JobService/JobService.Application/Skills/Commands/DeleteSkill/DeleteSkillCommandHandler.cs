@@ -15,6 +15,6 @@ public class DeleteSkillCommandHandler : IRequestHandler<DeleteSkillCommand, boo
     
     public async Task<bool> Handle(DeleteSkillCommand command, CancellationToken cancellationToken)
     {
-        return await _skillRepository.DeleteAsync(command.UserId, command.JobPostId, command.SkillId);
+        return await _skillRepository.DeleteAsync(command.AuthorId, command.JobPostId, command.SkillId);
     }
 }
