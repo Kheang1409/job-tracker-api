@@ -11,8 +11,8 @@ public class User
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
     public string Id { get; private set; } = string.Empty;
-    public string Firstname { get; private set; } = string.Empty;
-    public string Lastname { get; private set; } = string.Empty;
+    public string FirstName { get; private set; } = string.Empty;
+    public string LastName { get; private set; } = string.Empty;
     public string Bio { get; private set; } = string.Empty;
     public Gender Gender { get; private set; }
     public string Email { get; private set; } = string.Empty;
@@ -30,25 +30,27 @@ public class User
     public List<Address> Addresses { get; private set; } = new();
 
     public User() { }
-    private User(string email, string password, UserRole role)
+    private User(string firstName, string lastName, string email, string password, UserRole role)
     {
+        FirstName = firstName;
+        LastName = lastName;
         Email = email;
         PasswordHash = Hash(password);
         Role = role;
         CreatedAt = DateTime.UtcNow;
     }
 
-    public static User Create(string email, string password, UserRole role)
+    public static User Create(string firstName, string lastName, string email, string password, UserRole role)
     {
-        var user = new User(email, password, role);
+        var user = new User(firstName, lastName, email, password, role);
         return user;
     }
 
-    public void Update(string firstname, string lastname, string bio, Gender gender, string email, string countryCode, string phoneNumber)
+    public void Update(string firstName, string lastName, string bio, Gender gender, string email, string countryCode, string phoneNumber)
     {
         Email = email;
-        Firstname = firstname;
-        Lastname = lastname;
+        FirstName = firstName;
+        LastName = lastName;
         Bio = bio;
         Gender = gender;
         Email = email;

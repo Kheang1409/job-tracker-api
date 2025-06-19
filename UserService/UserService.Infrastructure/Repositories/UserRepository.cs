@@ -30,12 +30,12 @@ public class UserRepository : IUserRepository
 
             if (nameParts.Length > 0)
             {
-                filters.Add(filterBuilder.Regex(u => u.Firstname, new MongoDB.Bson.BsonRegularExpression(nameParts[0], "i")));
+                filters.Add(filterBuilder.Regex(u => u.FirstName, new MongoDB.Bson.BsonRegularExpression(nameParts[0], "i")));
             }
 
             if (nameParts.Length > 1)
             {
-                filters.Add(filterBuilder.Regex(u => u.Lastname, new MongoDB.Bson.BsonRegularExpression(nameParts[1], "i")));
+                filters.Add(filterBuilder.Regex(u => u.LastName, new MongoDB.Bson.BsonRegularExpression(nameParts[1], "i")));
             }
         }
 

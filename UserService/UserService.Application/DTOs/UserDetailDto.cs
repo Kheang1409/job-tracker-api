@@ -5,8 +5,8 @@ namespace JobTracker.UserService.Application.DTOs;
 public class UserDetailDto
 {
     public string Id { get; private set; } = string.Empty;
-    public string Firstname { get; private set; } = string.Empty;
-    public string Lastname { get; private set; } = string.Empty;
+    public string FirstName { get; private set; } = string.Empty;
+    public string LastName { get; private set; } = string.Empty;
     public string Bio { get; private set; } = string.Empty;
     public string Gender { get; private set; } = string.Empty;
     public string Email { get; private set; } = string.Empty;
@@ -21,8 +21,8 @@ public class UserDetailDto
     {
         return new UserDetailDto
         {
-            Firstname = user.Firstname,
-            Lastname = user.Lastname,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
             Bio = user.Bio,
             Gender = user.Gender.ToString(),
             Email = user.Email,

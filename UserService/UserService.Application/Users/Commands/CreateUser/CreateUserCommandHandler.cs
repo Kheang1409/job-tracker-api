@@ -22,7 +22,7 @@ public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, strin
         var existingUser = await _userRepository.GetByEmailAsync(command.Email);
         if (existingUser is not null)
             throw new InvalidOperationException($"A user with the email '{command.Email}' already exists.");
-        var user = _userFactory.CreateNormalUser(command.Email, command.Password);
+        var user = _userFactory.CreateNormalUser(command.Firstname, command.Lastname, command.Email, command.Password);
         var userId = await _userRepository.AddAsync(user);
         return userId;
     }

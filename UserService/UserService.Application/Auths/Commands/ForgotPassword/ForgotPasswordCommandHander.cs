@@ -27,7 +27,7 @@ public class ForgotPasswordCommandHandler : IRequestHandler<ForgotPasswordComman
         var notificationPayload = new
             {
                 Type = "Auth",
-                existingUser.Firstname,
+                existingUser.FirstName,
                 existingUser.Email,
                 existingUser.OTP
             };

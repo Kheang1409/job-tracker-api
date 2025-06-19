@@ -5,8 +5,8 @@ namespace JobTracker.UserService.Application.DTOs;
 public class UserDto
 {
     public string Id { get; private set; } = string.Empty;
-    public string Firstname { get; private set; } = string.Empty;
-    public string Lastname { get; private set; } = string.Empty;
+    public string FirstName { get; private set; } = string.Empty;
+    public string LastName { get; private set; } = string.Empty;
     public string Bio { get; private set; } = string.Empty;
 
     public static explicit operator UserDto(User user)
@@ -14,8 +14,8 @@ public class UserDto
         return new UserDto
         {
             Id = user.Id,
-            Firstname = user.Firstname,
-            Lastname = user.Lastname,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
             Bio = user.Bio
         };
     }

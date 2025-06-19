@@ -24,7 +24,10 @@ namespace JobTracker.UserService.Infrastructure.Services
                 throw new ArgumentNullException(nameof(user.Id), "User ID cannot be null or empty.");
             if (string.IsNullOrEmpty(user.Email))
                 throw new ArgumentNullException(nameof(user.Email), "Email cannot be null or empty.");
-            
+            if (string.IsNullOrEmpty(user.FirstName))
+                throw new ArgumentNullException(nameof(user.FirstName), "First name cannot be null or empty.");
+            if (string.IsNullOrEmpty(user.LastName))
+                throw new ArgumentNullException(nameof(user.LastName), "Last name cannot be null or empty.");
             // Retrieve JWT settings
             var jwtSettings = _configuration.GetSection("JwtSettings");
             var secretKey = jwtSettings["SecretKey"];
@@ -54,7 +57,9 @@ namespace JobTracker.UserService.Infrastructure.Services
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id),
                 new Claim(JwtRegisteredClaimNames.Email, user.Email),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()) // JWT ID (unique identifier)
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()), // JWT ID (unique identifier)
+                new Claim(JwtRegisteredClaimNames.GivenName, user.FirstName),
+                new Claim(JwtRegisteredClaimNames.FamilyName, user.LastName)
             };
 
             // Create JWT token

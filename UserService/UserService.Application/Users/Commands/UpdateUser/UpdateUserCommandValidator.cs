@@ -6,10 +6,10 @@ public class UpdateUserCommandValidator : AbstractValidator<UpdateUserCommand>
 {
     public UpdateUserCommandValidator()
     {
-        RuleFor(x => x.Firstname)
+        RuleFor(x => x.FirstName)
             .NotEmpty().WithMessage("Firstname is required.")
             .Length(2).WithMessage("Firstname must be valid.");
-        RuleFor(x => x.Lastname)
+        RuleFor(x => x.LastName)
             .NotEmpty().WithMessage("Lastname is required.")
             .Length(2).WithMessage($"Lastname must be valid.");
         RuleFor(x => x.Gender)
