@@ -32,29 +32,38 @@ public class KafkaConsumer : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _consumer.Subscribe("job-tracker-topic");
-
-        while (!stoppingToken.IsCancellationRequested)
+        await Task.Delay(5000, stoppingToken);
+        try
         {
-            var message = _consumer.Consume(stoppingToken);
-            if (message?.Message?.Value != null)
+            _consumer.Subscribe("job-tracker-topic");
+
+            while (!stoppingToken.IsCancellationRequested)
             {
-                var payload = JsonConvert.DeserializeObject<dynamic>(message.Message.Value);
-                if (payload is not null)
+                var message = _consumer.Consume(stoppingToken);
+                if (message?.Message?.Value != null)
                 {
-                    if (payload.Type.ToString() == "Auth")
-                        await HandleResetPassword(payload);
-                    if (payload.Type.ToString() == "Applied")
-                        await HandleApplied(payload);
-                    if (payload.Type.ToString() == "Move On")
-                        await HandleMoveOn(payload);
-                    if (payload.Type.ToString() == "Rejected")
-                        await HandleRejected(payload);
-                    if (payload.Type.ToString() == "Selected")
-                        await HandleSelected(payload);
+                    var payload = JsonConvert.DeserializeObject<dynamic>(message.Message.Value);
+                    if (payload is not null)
+                    {
+                        if (payload.Type.ToString() == "Auth")
+                            await HandleResetPassword(payload);
+                        if (payload.Type.ToString() == "Applied")
+                            await HandleApplied(payload);
+                        if (payload.Type.ToString() == "Move On")
+                            await HandleMoveOn(payload);
+                        if (payload.Type.ToString() == "Rejected")
+                            await HandleRejected(payload);
+                        if (payload.Type.ToString() == "Selected")
+                            await HandleSelected(payload);
+                    }
                 }
             }
         }
+        catch (Exception)
+        {
+            throw;
+        }
+        
         
     }
 
