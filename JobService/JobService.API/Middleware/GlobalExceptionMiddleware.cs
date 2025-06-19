@@ -1,7 +1,7 @@
 using System.Net;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
-using JobTracker.JobService.Application.CustomExceptions;
+using JobTracker.SharedKernel.Exceptions;
 
 namespace JobTracker.JobService.Api.Middleware;
 

@@ -1,4 +1,4 @@
-namespace JobTracker.UserService.Application.CustomExceptions;
+namespace JobTracker.SharedKernel.Exceptions;
 public class NotFoundException : Exception
 {
     public NotFoundException(string message) : base(message) { }

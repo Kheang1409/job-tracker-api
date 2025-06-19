@@ -1,4 +1,4 @@
-using JobTracker.UserService.Application.Infrastructure.Messaging;
+using JobTracker.SharedKernel.Messaging;
 using JobTracker.UserService.Application.Repositories;
 using MediatR;
 

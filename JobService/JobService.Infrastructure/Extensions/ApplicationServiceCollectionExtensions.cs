@@ -1,6 +1,6 @@
 using JobTracker.JobService.Application.JobLocations.Commands.CreateJobPost;
-using JobTracker.JobService.Application.Behaviors;
 using Microsoft.Extensions.DependencyInjection;
+using JobTracker.SharedKernel.Behaviors;
 using FluentValidation;
 using MediatR;
 using JobTracker.JobService.Application.JobLocations.Queries.GetJobPost;

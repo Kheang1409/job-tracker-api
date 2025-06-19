@@ -1,4 +1,4 @@
-using JobTracker.UserService.Application.CustomExceptions;
+using JobTracker.SharedKernel.Exceptions;
 using JobTracker.UserService.Domain.Entities;
 using MongoDB.Driver;
 

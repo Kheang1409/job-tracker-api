@@ -1,4 +1,3 @@
-using JobTracker.JobService.Application.CustomExceptions;
 using JobTracker.JobService.Application.Repositories;
 using MediatR;
 

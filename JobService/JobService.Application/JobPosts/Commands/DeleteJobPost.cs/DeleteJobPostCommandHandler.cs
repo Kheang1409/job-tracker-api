@@ -1,5 +1,5 @@
-using JobTracker.JobService.Application.CustomExceptions;
 using JobTracker.JobService.Application.Repositories;
+using JobTracker.SharedKernel.Exceptions;
 using MediatR;
 
 namespace JobTracker.JobService.Application.JobLocations.Commands.DeleteJobPost;

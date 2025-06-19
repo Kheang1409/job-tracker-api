@@ -1,4 +1,4 @@
-using JobTracker.UserService.Application.Infrastructure.Messaging;
+using JobTracker.SharedKernel.Messaging;
 using JobTracker.UserService.Infrastructure.Messaging;
 using Microsoft.Extensions.DependencyInjection;
 

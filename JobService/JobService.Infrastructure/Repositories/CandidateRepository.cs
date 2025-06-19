@@ -1,7 +1,7 @@
-using JobTracker.JobService.Application.CustomExceptions;
 using JobTracker.JobService.Application.Repositories;
 using JobTracker.JobService.Domain.Entities;
 using JobTracker.JobService.Domain.Enums;
+using JobTracker.SharedKernel.Exceptions;
 using MongoDB.Driver;
 
 namespace JobTracker.JobService.Infrastructure.Repositories;

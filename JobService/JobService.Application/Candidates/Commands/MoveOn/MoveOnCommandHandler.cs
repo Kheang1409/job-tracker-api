@@ -1,7 +1,7 @@
-using JobTracker.JobService.Application.CustomExceptions;
-using JobTracker.JobService.Application.Infrastructure.Messaging;
 using JobTracker.JobService.Application.Repositories;
 using JobTracker.JobService.Domain.Enums;
+using JobTracker.SharedKernel.Exceptions;
+using JobTracker.SharedKernel.Messaging;
 using MediatR;
 
 namespace JobTracker.JobService.Application.Candidates.MoveOn.Commands;

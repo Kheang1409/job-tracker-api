@@ -1,6 +1,6 @@
-using Confluent.Kafka;
-using JobTracker.JobService.Application.Infrastructure.Messaging;
+using JobTracker.SharedKernel.Messaging;
 using Microsoft.Extensions.Configuration;
+using Confluent.Kafka;
 using Newtonsoft.Json;
 
 namespace JobTracker.JobService.Infrastructure.Messaging;

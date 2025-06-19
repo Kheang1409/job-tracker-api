@@ -27,7 +27,6 @@ using JobTracker.UserService.Application.Projects.Commands.UpdateProject;
 using JobTracker.UserService.Application.Projects.Queries.GetProjects;
 using JobTracker.UserService.Application.Projects.Queries.GetProject;
 
-using JobTracker.UserService.Application.Behaviors;
 using JobTracker.UserService.Application.Services;
 
 
@@ -35,6 +34,7 @@ using JobTracker.UserService.Infrastructure.Services;
 using Microsoft.Extensions.DependencyInjection;
 using FluentValidation;
 using MediatR;
+using JobTracker.SharedKernel.Behaviors;
 
 namespace JobTracker.UserService.Infrastructure.Extensions;
 
