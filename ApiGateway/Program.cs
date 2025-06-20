@@ -8,13 +8,7 @@ builder.Configuration.AddJsonFile("ocelot.json", optional: false, reloadOnChange
 
 // Add Ocelot
 builder.Services.AddOcelot(builder.Configuration);
-
 var app = builder.Build();
-
-// Use authentication & authorization
-app.UseAuthentication();
-app.UseAuthorization();
-
 // Use Ocelot middleware
 await app.UseOcelot();
 

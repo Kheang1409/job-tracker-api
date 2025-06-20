@@ -11,11 +11,15 @@ public static class AuthenticationServiceCollectionExtensions
     public static IServiceCollection AddJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
     {
         var jwtSettings = configuration.GetSection("JwtSettings");
-        var secretKey = jwtSettings["SecretKey"];
-        if (string.IsNullOrEmpty(secretKey))
-            throw new InvalidOperationException("JWT SecretKey is missing in configuration. Please check the 'JwtSettings:SecretKey' value in your appsettings.");
-        var issuer = jwtSettings["Issuer"];
-        var audience = jwtSettings["Audience"];
+        var secretKey = Environment.GetEnvironmentVariable("JWT_SECRET_KEY") 
+                        ?? jwtSettings["SecretKey"]
+                        ?? throw new InvalidOperationException("JWT SecretKey is missing. Please provide it via environment or configuration.");
+        var issuer = Environment.GetEnvironmentVariable("JWT_ISSUER") 
+                        ?? jwtSettings["Issuer"]
+                        ?? throw new InvalidOperationException("JWT Issuer is missing. Please provide it via environment or configuration.");
+        var audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE") 
+                        ?? jwtSettings["Audience"]
+                        ?? throw new InvalidOperationException("JWT Audience is missing. Please provide it via environment or configuration.");
 
         services.AddAuthentication(options =>
         {

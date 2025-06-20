@@ -4,147 +4,147 @@
       "DownstreamPathTemplate": "/api/jobs/{jobId}/candidates",
       "UpstreamPathTemplate": "/api/jobs/{jobId}/candidates",
       "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [ { "Host": "localhost", "Port": 5002 } ],
+      "DownstreamHostAndPorts": [ { "Host": "jobservice", "Port": 8080  } ],
       "UpstreamHttpMethod": [ "GET", "POST" ]
     },
     {
       "DownstreamPathTemplate": "/api/jobs/{jobId}/candidates/{candidateId}",
       "UpstreamPathTemplate": "/api/jobs/{jobId}/candidates/{candidateId}",
       "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [ { "Host": "localhost", "Port": 5002 } ],
+      "DownstreamHostAndPorts": [ { "Host": "jobservice", "Port": 8080  } ],
       "UpstreamHttpMethod": [ "GET", "DELETE", "PATCH", "POST" ]
     },
     {
       "DownstreamPathTemplate": "/api/jobs",
       "UpstreamPathTemplate": "/api/jobs",
       "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [ { "Host": "localhost", "Port": 5002 } ],
+      "DownstreamHostAndPorts": [ { "Host": "jobservice", "Port": 8080  } ],
       "UpstreamHttpMethod": [ "GET", "POST" ]
     },
     {
       "DownstreamPathTemplate": "/api/jobs/{id}",
       "UpstreamPathTemplate": "/api/jobs/{id}",
       "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [ { "Host": "localhost", "Port": 5002 } ],
+      "DownstreamHostAndPorts": [ { "Host": "jobservice", "Port": 8080  } ],
       "UpstreamHttpMethod": [ "GET", "PUT", "DELETE" ]
     },
     {
       "DownstreamPathTemplate": "/api/jobs/{id}/status",
       "UpstreamPathTemplate": "/api/jobs/{id}/status",
       "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [ { "Host": "localhost", "Port": 5002 } ],
+      "DownstreamHostAndPorts": [ { "Host": "jobservice", "Port": 8080  } ],
       "UpstreamHttpMethod": [ "PUT" ]
     },
     {
       "DownstreamPathTemplate": "/api/jobs/{id}/location",
       "UpstreamPathTemplate": "/api/jobs/{id}/location",
       "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [ { "Host": "localhost", "Port": 5002 } ],
+      "DownstreamHostAndPorts": [ { "Host": "jobservice", "Port": 8080  } ],
       "UpstreamHttpMethod": [ "PUT" ]
     },
     {
       "DownstreamPathTemplate": "/api/jobs/{jobId}/skills",
       "UpstreamPathTemplate": "/api/jobs/{jobId}/skills",
       "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [ { "Host": "localhost", "Port": 5002 } ],
+      "DownstreamHostAndPorts": [ { "Host": "jobservice", "Port": 8080  } ],
       "UpstreamHttpMethod": [ "GET", "POST" ]
     },
     {
       "DownstreamPathTemplate": "/api/jobs/{jobId}/skills/{skillId}",
       "UpstreamPathTemplate": "/api/jobs/{jobId}/skills/{skillId}",
       "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [ { "Host": "localhost", "Port": 5002 } ],
+      "DownstreamHostAndPorts": [ { "Host": "jobservice", "Port": 8080  } ],
       "UpstreamHttpMethod": [ "GET", "DELETE" ]
     },
     {
       "DownstreamPathTemplate": "/api/users/{userId}",
       "UpstreamPathTemplate": "/api/users/{userId}",
       "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [ { "Host": "localhost", "Port": 5001 } ],
+      "DownstreamHostAndPorts": [ { "Host": "userservice", "Port": 8080  } ],
       "UpstreamHttpMethod": [ "GET" ]
     },
     {
       "DownstreamPathTemplate": "/api/users",
       "UpstreamPathTemplate": "/api/users",
       "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [ { "Host": "localhost", "Port": 5001 } ],
+      "DownstreamHostAndPorts": [ { "Host": "userservice", "Port": 8080  } ],
       "UpstreamHttpMethod": [ "POST", "GET" ]
     },
     {
       "DownstreamPathTemplate": "/api/users/{userId}/profile",
       "UpstreamPathTemplate": "/api/users/{userId}/profile",
       "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [ { "Host": "localhost", "Port": 5001 } ],
+      "DownstreamHostAndPorts": [ { "Host": "userservice", "Port": 8080  } ],
       "UpstreamHttpMethod": [ "GET", "PUT" ]
     },
     {
       "DownstreamPathTemplate": "/api/users/me/addresses",
       "UpstreamPathTemplate": "/api/users/me/addresses",
       "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [ { "Host": "localhost", "Port": 5001 } ],
+      "DownstreamHostAndPorts": [ { "Host": "userservice", "Port": 8080  } ],
       "UpstreamHttpMethod": [ "GET", "POST" ]
     },
     {
       "DownstreamPathTemplate": "/api/users/me/addresses/{id}",
       "UpstreamPathTemplate": "/api/users/me/addresses/{id}",
       "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [ { "Host": "localhost", "Port": 5001 } ],
+      "DownstreamHostAndPorts": [ { "Host": "userservice", "Port": 8080  } ],
       "UpstreamHttpMethod": [ "GET", "PUT", "DELETE" ]
     },
     {
       "DownstreamPathTemplate": "/api/users/me/projects",
       "UpstreamPathTemplate": "/api/users/me/projects",
       "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [ { "Host": "localhost", "Port": 5001 } ],
+      "DownstreamHostAndPorts": [ { "Host": "userservice", "Port": 8080  } ],
       "UpstreamHttpMethod": [ "GET", "POST" ]
     },
     {
       "DownstreamPathTemplate": "/api/users/me/projects/{id}",
       "UpstreamPathTemplate": "/api/users/me/projects/{id}",
       "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [ { "Host": "localhost", "Port": 5001 } ],
+      "DownstreamHostAndPorts": [ { "Host": "userservice", "Port": 8080  } ],
       "UpstreamHttpMethod": [ "GET", "PUT", "DELETE" ]
     },
     {
       "DownstreamPathTemplate": "/api/users/me/skills",
       "UpstreamPathTemplate": "/api/users/me/skills",
       "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [ { "Host": "localhost", "Port": 5001 } ],
+      "DownstreamHostAndPorts": [ { "Host": "userservice", "Port": 8080  } ],
       "UpstreamHttpMethod": [ "GET", "POST" ]
     },
     {
       "DownstreamPathTemplate": "/api/users/me/skills/{id}",
       "UpstreamPathTemplate": "/api/users/me/skills/{id}",
       "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [ { "Host": "localhost", "Port": 5001 } ],
+      "DownstreamHostAndPorts": [ { "Host": "userservice", "Port": 8080  } ],
       "UpstreamHttpMethod": [ "GET", "PUT", "DELETE" ]
     },
     {
       "DownstreamPathTemplate": "/api/users/me",
       "UpstreamPathTemplate": "/api/users/me",
       "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [ { "Host": "localhost", "Port": 5001 } ],
+      "DownstreamHostAndPorts": [ { "Host": "userservice", "Port": 8080  } ],
       "UpstreamHttpMethod": [ "GET", "PUT", "DELETE" ]
     },
     {
       "DownstreamPathTemplate": "/api/auth/forgot-password",
       "UpstreamPathTemplate": "/api/auth/forgot-password",
       "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [ { "Host": "localhost", "Port": 5001 } ],
+      "DownstreamHostAndPorts": [ { "Host": "userservice", "Port": 8080  } ],
       "UpstreamHttpMethod": [ "POST" ]
     },
     {
       "DownstreamPathTemplate": "/api/auth/reset-password",
       "UpstreamPathTemplate": "/api/auth/reset-password",
       "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [ { "Host": "localhost", "Port": 5001 } ],
+      "DownstreamHostAndPorts": [ { "Host": "userservice", "Port": 8080  } ],
       "UpstreamHttpMethod": [ "POST" ]
     },
     {
       "DownstreamPathTemplate": "/api/auth/login",
       "UpstreamPathTemplate": "/api/auth/login",
       "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [ { "Host": "localhost", "Port": 5001 } ],
+      "DownstreamHostAndPorts": [ { "Host": "userservice", "Port": 8080  } ],
       "UpstreamHttpMethod": [ "POST" ]
     }
   ],

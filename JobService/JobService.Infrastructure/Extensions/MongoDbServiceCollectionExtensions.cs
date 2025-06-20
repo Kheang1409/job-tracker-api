@@ -12,31 +12,29 @@ public static class MongoDbServiceCollectionExtensions
 {
     public static IServiceCollection AddMongoDb(this IServiceCollection services, IConfiguration configuration)
     {
-        var mongoConnectionString = configuration.GetConnectionString("MongoDB");
-    var databaseName = configuration.GetValue<string>("MongoDbSettings:DatabaseName");
+        var mongoConnectionString = Environment.GetEnvironmentVariable("CONNECTION_STRINGS")
+                                    ?? configuration.GetConnectionString("MongoDB")
+                                    ?? throw new ArgumentException("Connection string 'MongoDB' is not configured.");
+        var databaseName =  Environment.GetEnvironmentVariable("MONGODB_DATABASE_NAME")
+                            ?? configuration.GetValue<string>("MongoDbSettings:DatabaseName")
+                            ?? throw new ArgumentException("MongoDbSettings:DatabaseName is not configured.");
 
-    if (string.IsNullOrEmpty(mongoConnectionString))
-        throw new ArgumentException("Connection string 'MongoDB' is not configured.");
+        // Register MongoClient
+        services.AddSingleton<IMongoClient>(_ => new MongoClient(mongoConnectionString));
 
-    if (string.IsNullOrEmpty(databaseName))
-        throw new ArgumentException("MongoDbSettings:DatabaseName is not configured.");
+        // Register IMongoDatabase using the configured DB name
+        services.AddScoped<IMongoDatabase>(sp =>
+        {
+            var client = sp.GetRequiredService<IMongoClient>();
+            return client.GetDatabase(databaseName);
+        });
 
-    // Register MongoClient
-    services.AddSingleton<IMongoClient>(_ => new MongoClient(mongoConnectionString));
+        // Repositories and Factories
+        services.AddScoped<IJobPostRepository, JobPostRepository>();
+        services.AddScoped<ISkillRepository, SkillRepository>();
+        services.AddScoped<ICandidateRepository, CandidateRepository>();
+        services.AddScoped<IJobPostFactory, JobPostFactory>();
 
-    // Register IMongoDatabase using the configured DB name
-    services.AddScoped<IMongoDatabase>(sp =>
-    {
-        var client = sp.GetRequiredService<IMongoClient>();
-        return client.GetDatabase(databaseName);
-    });
-
-    // Repositories and Factories
-    services.AddScoped<IJobPostRepository, JobPostRepository>();
-    services.AddScoped<ISkillRepository, SkillRepository>();
-    services.AddScoped<ICandidateRepository, CandidateRepository>();
-    services.AddScoped<IJobPostFactory, JobPostFactory>();
-
-    return services;
+        return services;
     }
 }

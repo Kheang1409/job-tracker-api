@@ -30,10 +30,18 @@ namespace JobTracker.UserService.Infrastructure.Services
                 throw new ArgumentNullException(nameof(user.LastName), "Last name cannot be null or empty.");
             // Retrieve JWT settings
             var jwtSettings = _configuration.GetSection("JwtSettings");
-            var secretKey = jwtSettings["SecretKey"];
-            var issuer = jwtSettings["Issuer"];
-            var audience = jwtSettings["Audience"];
-            var expiryMinutesString = jwtSettings["ExpiryMinutes"];
+            var secretKey = Environment.GetEnvironmentVariable("JWT_SECRET_KEY")
+                            ?? jwtSettings["SecretKey"]
+                            ?? throw new InvalidOperationException("JWT SecretKey is missing. Please provide it via environment or configuration.");;
+            var issuer = Environment.GetEnvironmentVariable("JWT_ISSUER") 
+                        ?? jwtSettings["Issuer"]
+                        ?? throw new InvalidOperationException("JWT Issuer is missing. Please provide it via environment or configuration.");
+            var audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE") 
+                        ?? jwtSettings["Audience"]
+                        ?? throw new InvalidOperationException("JWT Audience is missing. Please provide it via environment or configuration.");
+            var expiryMinutesString = Environment.GetEnvironmentVariable("JWT_EXPIRY_MINUTES") 
+                        ?? jwtSettings["ExpiryMinutes"]
+                        ?? throw new InvalidOperationException("ExpiryMinutes is missing. Please provide it via environment or configuration.");
 
             // Validate that configuration settings are available
             if (string.IsNullOrEmpty(secretKey))

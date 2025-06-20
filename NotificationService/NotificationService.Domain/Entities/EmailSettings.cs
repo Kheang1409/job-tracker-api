@@ -3,7 +3,7 @@ namespace JobTracker.NotificationService.Domain.Entities;
 public class EmailSettings
 {
     public string SmtpServer { get; private set; } = string.Empty;
-    public int Port { get; set; }
+    public int Port { get; private set; }
     public string SenderEmail { get; private set; } = string.Empty;
     public string SenderPassword { get; private set; } = string.Empty;
 

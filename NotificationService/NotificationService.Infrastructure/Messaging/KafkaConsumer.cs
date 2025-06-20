@@ -23,8 +23,12 @@ public class KafkaConsumer : BackgroundService
         _emailService = emailService;
         var kafkaConfig = new ConsumerConfig
         {
-            BootstrapServers = configuration["Kafka:BootstrapServers"],
-            GroupId = configuration["Kafka:GroupId"],
+            BootstrapServers = Environment.GetEnvironmentVariable("KAFKA_BOOTSTRAP_SERVERS")
+                                ?? configuration["Kafka:BootstrapServers"]
+                                ?? throw new InvalidOperationException("Kafka:BootstrapServers is not configured."),
+            GroupId = Environment.GetEnvironmentVariable("KAFKA_GROUP_ID")
+                        ?? configuration["Kafka:GroupId"]
+                        ?? throw new InvalidOperationException("Kafka:GroupId is not configured."),
             AutoOffsetReset = AutoOffsetReset.Earliest
         };
         _consumer = new ConsumerBuilder<string, string>(kafkaConfig).Build();

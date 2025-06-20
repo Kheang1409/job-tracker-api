@@ -12,7 +12,9 @@ public class KafkaProducer : IKafkaProducer
     {
         var kafkaConfig = new ProducerConfig
         {
-            BootstrapServers = configuration["Kafka:BootstrapServers"]
+            BootstrapServers = Environment.GetEnvironmentVariable("KAFKA_BOOTSTRAP_SERVERS")
+                                ?? configuration["Kafka:BootstrapServers"]
+                                ?? throw new InvalidOperationException("Kafka:BootstrapServers is not configured.")
         };
         _producer = new ProducerBuilder<string, string>(kafkaConfig).Build();
     }

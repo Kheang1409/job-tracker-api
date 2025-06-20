@@ -12,10 +12,18 @@ public static class ApplicationServiceCollectionExtensions
     {
         var emailSettingsSection = configuration.GetSection("EmailSettings");
         
-        string smtpServer = emailSettingsSection["SmtpServer"] ?? throw new ArgumentException("Email setting 'SmtpServer' is missing or empty.");
-        string portString = emailSettingsSection["Port"] ?? throw new ArgumentException("Email setting 'Port' is missing or not a valid integer.");
-        string senderEmail = emailSettingsSection["SenderEmail"] ?? throw new ArgumentException("Email setting 'SenderEmail' is missing or empty.");
-        string senderPassword = emailSettingsSection["SenderPassword"] ?? throw new ArgumentException("Email setting 'SenderPassword' is missing or empty.");
+        string smtpServer = Environment.GetEnvironmentVariable("SMTP_SERVER")
+                            ?? emailSettingsSection["SmtpServer"]
+                            ?? throw new ArgumentException("Email setting 'SmtpServer' is missing or empty.");
+        string portString = Environment.GetEnvironmentVariable("SMTP_PORT")
+                            ?? emailSettingsSection["Port"]
+                            ?? throw new ArgumentException("Email setting 'Port' is missing or not a valid integer.");
+        string senderEmail = Environment.GetEnvironmentVariable("SMTP_SENDER_EMAIL")
+                            ?? emailSettingsSection["SenderEmail"]
+                            ?? throw new ArgumentException("Email setting 'SenderEmail' is missing or empty.");
+        string senderPassword = Environment.GetEnvironmentVariable("SMTP_SENDER_PASSWORD")
+                            ?? emailSettingsSection["SenderPassword"]
+                            ?? throw new ArgumentException("Email setting 'SenderPassword' is missing or empty.");
 
         var emailSettings = new EmailSettings(smtpServer, int.Parse(portString), senderEmail, senderPassword);
         services.AddSingleton(emailSettings);
