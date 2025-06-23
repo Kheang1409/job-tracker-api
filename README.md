@@ -40,5 +40,5 @@ Ensure you have the following installed on your machine:
 #### 1. Clone the Repository
 Start by cloning the repository to your local machine:
 ```bash
-git clone https://github.com/your-username/job-tracker.git
+git clone [https://github.com/your-username/job-tracker.git](https://github.com/Kheang1409/job-tracker-api)
 cd job-tracker
