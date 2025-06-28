@@ -1,17 +1,22 @@
-# Stage 1: Build the application
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
-WORKDIR /app
+FROM mcr.microsoft.com/dotnet/sdk:latest AS build
+WORKDIR /src
 
+# Copy csproj files and restore dependencies
+COPY UserService/UserService.API/UserService.API.csproj ./UserService/UserService.API/
+COPY UserService/UserService.Application/UserService.Application.csproj ./UserService/UserService.Application/
+COPY UserService/UserService.Domain/UserService.Domain.csproj ./UserService/UserService.Domain/
+COPY UserService/UserService.Infrastructure/UserService.Infrastructure.csproj ./UserService/UserService.Infrastructure/
+
+RUN dotnet restore ./UserService/UserService.API/UserService.API.csproj
+
+# Copy full source and build
 COPY . .
-RUN dotnet publish -c Release -o out
+RUN dotnet publish ./UserService/UserService.API/UserService.API.csproj -c Release -o /app/publish
 
-# Stage 2: Run the application
-FROM mcr.microsoft.com/dotnet/aspnet:9.0
+# Runtime image
+FROM mcr.microsoft.com/dotnet/aspnet:latest
 WORKDIR /app
-COPY --from=build /app/out .
+COPY --from=build /app/publish .
 
-# Expose port 5000
-EXPOSE 5000
-
-# Start the service
-ENTRYPOINT ["dotnet", "UserService.dll"]
+EXPOSE 5001
+ENTRYPOINT ["dotnet", "UserService.API.dll"]

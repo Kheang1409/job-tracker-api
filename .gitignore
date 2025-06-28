@@ -1,27 +1,75 @@
-# Ignore Visual Studio files
-.vs/
+# .NET Core build artifacts
 bin/
 obj/
-*.user
-*.suo
-*.tmp
-*.bak
-
-# Ignore .NET build artifacts
 *.dll
 *.exe
 *.pdb
+*.app
+*.log
+*.db
+*.db-shm
+*.db-wal
+
+# Visual Studio files
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
 *.cache
-*.debug
+*.log
+*.ncb
+*.sdf
+*.opensdf
+*.VC.db
 
-# Ignore Docker files
+# Build results and debug files
+*.Build.cs
+*.bak
+*.tmp
+*.log
+
+# Rider / JetBrains files
+.idea/
+*.sln.iml
+
+# Test results
+TestResults/
+*.coverage
+*.coveragexml
+*.testsettings
+*.vsmdi
+*.psess
+*.vsp
+*.vspx
+*.sap
+
+# Docker
 docker-compose.override.yml
+*.dockerfile
+Dockerfile.*
 
-# User secrets and environment variables
-appsettings.Development.json
-secrets.json
+# ASP.NET User Secrets & Environment Configs
+**/appsettings.Development.json
+**/secrets.json
+**/local.settings.json
+.env
+.env.*
 
-# Exclude logs and temp directories
+# Logs
 logs/
 *.log
-temp/
+
+# Others
+*.nupkg
+*.snupkg
+*.swp
+*.DS_Store
+Thumbs.db
+
+# Backup files
+*~
+*.orig
+
+# Ignore .env files
+.env
