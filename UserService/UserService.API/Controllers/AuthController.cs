@@ -2,7 +2,9 @@ using JobTracker.UserService.Application.Auths.Commands.ForgotPassword;
 using JobTracker.UserService.Application.Auths.Commands.ResetPassword;
 using JobTracker.UserService.Application.Auths.Commands.Login;
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using MediatR;
 
 namespace JobTracker.UserService.API.Controllers;
@@ -24,16 +26,22 @@ public class AuthController : ControllerBase
 
         if (command == null)
             return BadRequest("Invalid input data.");
-        await _mediator.Send(command);
-        return NoContent();
+        var token =  await _mediator.Send(command);
+        return Ok(new { Token = token });
     }
-
+    [Authorize]
     [HttpPost("reset-password")]
     public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordCommand command)
     {
         if (command == null)
             return BadRequest("Invalid input data.");
-        await _mediator.Send(command);
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new UnauthorizedAccessException();
+        var commandWithId = new ResetPasswordWithIdCommand(
+            userId,
+            command.OTP,
+            command.Password
+        );
+        await _mediator.Send(commandWithId);
         return NoContent();
     }
 

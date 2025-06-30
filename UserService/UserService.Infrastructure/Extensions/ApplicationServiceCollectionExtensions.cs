@@ -2,12 +2,6 @@ using JobTracker.UserService.Application.Auths.Commands.Login;
 using JobTracker.UserService.Application.Auths.Commands.ResetPassword;
 using JobTracker.UserService.Application.Auths.Commands.ForgotPassword;
 
-using JobTracker.UserService.Application.Addresses.Commands.CreateAddress;
-using JobTracker.UserService.Application.Addresses.Commands.DeleteAddress;
-using JobTracker.UserService.Application.Addresses.Commands.UpdateAddress;
-using JobTracker.UserService.Application.Addresses.Queries.GetAddresses;
-using JobTracker.UserService.Application.Addresses.Queries.GetAddress;
-
 using JobTracker.UserService.Application.Skills.Commands.CreateSkill;
 using JobTracker.UserService.Application.Skills.Commands.DeleteSkill;
 using JobTracker.UserService.Application.Skills.Commands.UpdateSkill;
@@ -47,6 +41,7 @@ public static class ApplicationServiceCollectionExtensions
             //Auth
             cfg.RegisterServicesFromAssemblyContaining<ForgotPasswordCommand>();
             cfg.RegisterServicesFromAssemblyContaining<ResetPasswordCommand>();
+            cfg.RegisterServicesFromAssemblyContaining<ResetPasswordWithIdCommand>();
             cfg.RegisterServicesFromAssemblyContaining<LoginCommand>();
 
             //Users
@@ -69,25 +64,12 @@ public static class ApplicationServiceCollectionExtensions
             cfg.RegisterServicesFromAssemblyContaining<GetSkillQuery>();
             cfg.RegisterServicesFromAssemblyContaining<GetSkillsQuery>();
 
-            //Address
-            cfg.RegisterServicesFromAssemblyContaining<CreateAddressCommand>();
-            cfg.RegisterServicesFromAssemblyContaining<CreateAddressWithIdCommand>();
-            cfg.RegisterServicesFromAssemblyContaining<UpdateAddressCommand>();
-            cfg.RegisterServicesFromAssemblyContaining<UpdateAddressWithIdCommand>();
-            cfg.RegisterServicesFromAssemblyContaining<DeleteAddressCommand>();
-
-            cfg.RegisterServicesFromAssemblyContaining<GetAddressQuery>();
-            cfg.RegisterServicesFromAssemblyContaining<GetAddressesQuery>();
-
             //Project
             cfg.RegisterServicesFromAssemblyContaining<CreateProjectCommand>();
             cfg.RegisterServicesFromAssemblyContaining<CreateProjectWithIdCommand>(); 
             cfg.RegisterServicesFromAssemblyContaining<UpdateProjectCommand>();
             cfg.RegisterServicesFromAssemblyContaining<UpdateProjectWithIdCommand>();
             cfg.RegisterServicesFromAssemblyContaining<DeleteProjectCommand>();
-
-            cfg.RegisterServicesFromAssemblyContaining<GetAddressQuery>();
-            cfg.RegisterServicesFromAssemblyContaining<GetAddressesQuery>();
         });
 
         //Users
@@ -107,12 +89,6 @@ public static class ApplicationServiceCollectionExtensions
         services.AddValidatorsFromAssemblyContaining<DeleteSkillCommandValidator>();
         services.AddValidatorsFromAssemblyContaining<GetSkillQueryValidator>();
         services.AddValidatorsFromAssemblyContaining<GetSkillsQueryValidator>();
-
-        //Address
-        services.AddValidatorsFromAssemblyContaining<CreateAddressCommandValidator>();
-        services.AddValidatorsFromAssemblyContaining<DeleteAddressCommandValidator>();
-        services.AddValidatorsFromAssemblyContaining<GetAddressQueryValidator>();
-        services.AddValidatorsFromAssemblyContaining<GetAddressesQueryValidator>();
 
         // Project
         services.AddValidatorsFromAssemblyContaining<CreateProjectCommandValidator>();

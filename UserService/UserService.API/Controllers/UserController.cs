@@ -53,8 +53,13 @@ public class UserController : ControllerBase
             command.Bio,
             command.Gender,
             command.Email,
-            command.CountryCode,
-            command.PhoneNumber);
+            command.PhoneNumber,
+            command.Country,
+            command.Street,
+            command.City,
+            command.State,
+            command.PostalCode
+        );
         await _mediator.Send(commandWithId);
         return NoContent();
     }

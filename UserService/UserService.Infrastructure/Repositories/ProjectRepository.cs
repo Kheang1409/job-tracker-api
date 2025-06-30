@@ -54,10 +54,10 @@ public class ProjectRepository : IProjectRepository
         );
 
         var update = Builders<User>.Update
-            .Set(u => u.Projects[0].Name, Project.Name)
-            .Set(u => u.Projects[0].About, Project.About)
-            .Set(u => u.Projects[0].StartDate, Project.StartDate)
-            .Set(u => u.Projects[0].EndDate, Project.EndDate);
+            .Set("Projects.$.Name", Project.Name)
+            .Set("Projects.$.About", Project.About)
+            .Set("Projects.$.StartDate", Project.StartDate)
+            .Set("Projects.$.EndDate", Project.EndDate);
 
         var result = await _users.UpdateOneAsync(filter, update);
         if (result.MatchedCount == 0)
@@ -67,7 +67,7 @@ public class ProjectRepository : IProjectRepository
     public async Task<bool> DeleteAsync(string UserId, string ProjectId)
     {
         var filter = Builders<User>.Filter.Eq(u => u.Id, UserId);
-        var update = Builders<User>.Update.PullFilter(u => u.Addresses, s => s.Id == ProjectId);
+        var update = Builders<User>.Update.PullFilter(u => u.Projects, s => s.Id == ProjectId);
         var result = await _users.UpdateOneAsync(filter, update);
         if (result.MatchedCount == 0)
             throw new NotFoundException("User or Project not found");

@@ -1,6 +1,6 @@
 using JobTracker.UserService.Domain.Entities;
 using JobTracker.UserService.Domain.Factories;
-using JobTracker.UserService.Domain.Enum;
+using JobTracker.UserService.Domain.Enums;
 
 namespace JobTracker.UserService.Infrastructure.Factories;
 

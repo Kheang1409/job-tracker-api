@@ -40,7 +40,10 @@ public class GlobalExceptionMiddleware
             Status = statusCode,
             Title = title,
             Detail = _env.IsDevelopment() ? detail : null,
-            Instance = context.Request.Path
+            Instance = context.Request.Path,
+            Extensions = {
+                ["message"] = exception.Message
+            }
         };
 
         context.Response.StatusCode = statusCode;

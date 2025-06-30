@@ -66,14 +66,6 @@ public class UserRepository : IUserRepository
     public async Task<User> GetByEmailAsync(string Email) =>
         await _users.Find(u => u.Email == Email).SingleOrDefaultAsync();
 
-    public async Task<User> GetByOTPAsync(string OTP)
-    {
-        var user = await _users.Find(u => u.OTP == OTP).SingleOrDefaultAsync();
-        if (user is null)
-            throw new NotFoundException($"The provided OTP '{OTP}' is invalid or has expired.");
-        return user;
-    }
-
     public async Task<string> AddAsync(User user) 
     {
         await _users.InsertOneAsync(user);

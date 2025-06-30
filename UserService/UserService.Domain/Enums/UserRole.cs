@@ -1,4 +1,4 @@
-namespace JobTracker.UserService.Domain.Enum;
+namespace JobTracker.UserService.Domain.Enums;
 
 public enum UserRole
 {

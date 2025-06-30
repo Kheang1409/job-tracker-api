@@ -8,41 +8,35 @@ public class Address
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
     public string Id { get; private set; } = string.Empty;
-    public string Address1 { get; private set; } = string.Empty;
-    public string Address2 { get; private set; } = string.Empty;
-    public int PostalCode { get; private set; }
-    public string City { get; private set; } = string.Empty;
-    public string County { get; private set; } = string.Empty;
-    public string State { get; private set; } = string.Empty;
     public string Country { get; private set; } = string.Empty;
+    public string Street { get; private set; } = string.Empty;
+    public string City { get; private set; } = string.Empty;
+    public string State { get; private set; } = string.Empty;
+    public int PostalCode { get; private set; }
 
     public Address() { }
 
-    private Address(string address1, string address2, int postalCode, string city, string county, string state, string country)
+    private Address(string country, string street, string city, string state, int postalCode)
     {
         Id = ObjectId.GenerateNewId().ToString();
-        Address1 = address1;
-        Address2 = address2;
-        PostalCode = postalCode;
-        City = city;
-        County = county;
-        State = state;
         Country = country;
+        Street = street;
+        City = city;
+        State = state;
+        PostalCode = postalCode;
     }
 
-    public static Address Create(string address1, string address2, int postalCode, string city, string county, string state, string country)
+    public static Address Create(string country, string street, string city, string state, int postalCode)
     {
-        return new Address(address1, address2, postalCode, city, county, state, country);
+        return new Address(country, street, city, state, postalCode);
     }
 
-    public void Update(string address1, string address2, int postalCode, string city, string county, string state, string country)
+    public void Update(string country, string street, string city, string state, int postalCode)
     {
-        Address1 = address1;
-        Address2 = address2;
-        PostalCode = postalCode;
-        City = city;
-        County = county;
-        State = state;
         Country = country;
+        Street = street;
+        City = city;
+        State = state;
+        PostalCode = postalCode;
     }
 }

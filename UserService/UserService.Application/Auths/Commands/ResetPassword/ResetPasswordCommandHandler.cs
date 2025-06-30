@@ -1,9 +1,10 @@
 using JobTracker.UserService.Application.Repositories;
 using MediatR;
+using MongoDB.Bson;
 
 namespace JobTracker.UserService.Application.Auths.Commands.ResetPassword;
 
-public class ResetPasswordCommandHandler : IRequestHandler<ResetPasswordCommand, bool>
+public class ResetPasswordCommandHandler : IRequestHandler<ResetPasswordWithIdCommand, bool>
 {
     private readonly IUserRepository _userRepository;
 
@@ -13,13 +14,13 @@ public class ResetPasswordCommandHandler : IRequestHandler<ResetPasswordCommand,
         _userRepository = userRepository;
     }
     
-    public async Task<bool> Handle(ResetPasswordCommand command, CancellationToken cancellationToken)
+    public async Task<bool> Handle(ResetPasswordWithIdCommand command, CancellationToken cancellationToken)
     {
-        var existingUser = await _userRepository.GetByOTPAsync(command.OTP);
-        if(existingUser is null)
+        var user = await _userRepository.GetByIdAsync(command.userId);
+        if (user is null || string.IsNullOrEmpty(user?.OTP))
             throw new InvalidOperationException($"The provided OTP '{command.OTP}' is invalid or has expired.");
-        existingUser.ResetPassword(command.Password);
-        await _userRepository.UpdateAsync(existingUser);
+        user.ResetPassword(command.Password);
+        await _userRepository.UpdateAsync(user);
         return true;
     }
 }

@@ -32,7 +32,6 @@ public static class MongoDbServiceCollectionExtensions
         // Repositories and Factories
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<ISkillRepository, SkillRepository>();
-        services.AddScoped<IAddressRepository, AddressRepository>();
         services.AddScoped<IProjectRepository, ProjectRepository>();
 
         services.AddScoped<IUserFactory, UserFactory>();

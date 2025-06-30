@@ -1,38 +1,54 @@
 using JobTracker.UserService.Application.Repositories;
 using JobTracker.UserService.Application.Services;
+using JobTracker.UserService.Domain.Commons;
+using JobTracker.UserService.Domain.Entities;
 using MediatR;
+using MongoDB.Bson;
 
 namespace JobTracker.UserService.Application.Users.Commands.UpdateUser;
 
-public class UpdateUserCommandHandler : IRequestHandler<UpdateUserWithIdCommand, string>
+public class UpdateUserCommandHandler : IRequestHandler<UpdateUserWithIdCommand, bool>
 {
     private readonly IUserRepository _userRepository;
-    private readonly IJwtService _jwtService;
     public UpdateUserCommandHandler(
-        IUserRepository userRepository,
-        IJwtService jwtService
+        IUserRepository userRepository
     )
     {
         _userRepository = userRepository;
-        _jwtService = jwtService;
     }
     
-    public async Task<string> Handle(UpdateUserWithIdCommand command, CancellationToken cancellationToken)
+    public async Task<bool> Handle(UpdateUserWithIdCommand command, CancellationToken cancellationToken)
     {
-        var existingUser = await _userRepository.GetByIdAsync(command.Id);
-        existingUser.Update(
-            command.Firstname,
-            command.Lastname,
+        var user = await _userRepository.GetByIdAsync(command.Id);
+        user.Update(
+            command.FirstName,
+            command.LastName,
             command.Bio,
-            command.Gender,
+            EnumParser.Gender(command.Gender),
             command.Email,
-            command.CountryCode,
             command.PhoneNumber
         );
-        var isUpdate = await _userRepository.UpdateAsync(existingUser);
-        // if(!isUpdate)
-        //     throw new 
-        var token = await _jwtService.GenerateToken(existingUser);
-        return token;
+        if (user.Address is null)
+        {
+            var address = Address.Create(
+                command.Country,
+                command.Street,
+                command.City,
+                command.State,
+                command.PostalCode
+            );
+            user.SetAddress(address);
+        }
+        else
+        {
+            user.Address?.Update(
+            command.Country,
+            command.Street,
+            command.City,
+            command.State,
+            command.PostalCode);
+        }
+        
+        return await _userRepository.UpdateAsync(user);
     }
 }

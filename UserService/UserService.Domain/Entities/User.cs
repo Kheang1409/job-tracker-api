@@ -1,6 +1,6 @@
 using System.Security.Cryptography;
 using System.Text;
-using JobTracker.UserService.Domain.Enum;
+using JobTracker.UserService.Domain.Enums;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
@@ -16,7 +16,6 @@ public class User
     public string Bio { get; private set; } = string.Empty;
     public Gender Gender { get; private set; }
     public string Email { get; private set; } = string.Empty;
-    public string CountryCode { get; private set; } = string.Empty;
     public string PhoneNumber { get; private set; } = string.Empty;
     public string PasswordHash { get; private set; } = string.Empty;
     public string OTP { get; private set; } = string.Empty;
@@ -27,7 +26,7 @@ public class User
     public List<Skill> Skills { get; private set; } = new();
     public List<Experience> Experiences { get; private set; } = new();
     public List<Project> Projects { get; private set; } = new();
-    public List<Address> Addresses { get; private set; } = new();
+    public Address? Address { get; private set; }
 
     public User() { }
     private User(string firstName, string lastName, string email, string password, UserRole role)
@@ -46,7 +45,12 @@ public class User
         return user;
     }
 
-    public void Update(string firstName, string lastName, string bio, Gender gender, string email, string countryCode, string phoneNumber)
+    public void SetAddress(Address address)
+    {
+        Address = address ?? throw new ArgumentNullException(nameof(address), "Address cannot be null");
+    }
+
+    public void Update(string firstName, string lastName, string bio, Gender gender, string email, string phoneNumber)
     {
         Email = email;
         FirstName = firstName;
@@ -54,7 +58,6 @@ public class User
         Bio = bio;
         Gender = gender;
         Email = email;
-        CountryCode = countryCode;
         PhoneNumber = phoneNumber;
         ModifiedAt = DateTime.UtcNow;
     }
@@ -78,6 +81,7 @@ public class User
 
     public void ResetPassword(string password)
     {
+        OTP = string.Empty;
         PasswordHash = Hash(password);
     }
 
