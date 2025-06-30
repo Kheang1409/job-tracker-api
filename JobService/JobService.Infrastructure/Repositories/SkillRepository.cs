@@ -46,7 +46,7 @@ public class SkillRepository : ISkillRepository
     public async Task<string> AddAsync(string UserId, string JobPostId, Skill Skill)
     {
         var jobPosting = await _jobPostRepository.GetByIdAsync(JobPostId);
-        if(jobPosting.AutherId != UserId)
+        if(jobPosting.AuthorId != UserId)
             throw new UnauthorizedAccessException("User is not authorized to modify this job posting");
 
         var filter = Builders<JobPosting>.Filter.And(
@@ -62,7 +62,7 @@ public class SkillRepository : ISkillRepository
     public async Task<bool> UpdateAsync(string UserId, string JobPostId, Skill Skill)
     {
         var jobPosting = await _jobPostRepository.GetByIdAsync(JobPostId);
-        if(jobPosting.AutherId != UserId)
+        if(jobPosting.AuthorId != UserId)
             throw new UnauthorizedAccessException("User is not authorized to modify this job posting");
 
         var filter = Builders<JobPosting>.Filter.And(
@@ -82,7 +82,7 @@ public class SkillRepository : ISkillRepository
     public async Task<bool> DeleteAsync(string UserId, string JobPostId, string SkillId)
     {
         var jobPosting = await _jobPostRepository.GetByIdAsync(JobPostId);
-        if(jobPosting.AutherId != UserId)
+        if(jobPosting.AuthorId != UserId)
             throw new UnauthorizedAccessException("User is not authorized to modify this job posting");
 
         var filter = Builders<JobPosting>.Filter.Eq(u => u.Id, JobPostId);

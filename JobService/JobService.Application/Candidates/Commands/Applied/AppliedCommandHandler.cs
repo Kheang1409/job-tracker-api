@@ -31,7 +31,7 @@ public class AppliedCommandHandler : IRequestHandler<AppliedCommand, string>
             throw new NotFoundException("JobPosting not found");
         if (jobPosting.Status == JobPostStatus.Closed)
             throw new ArgumentException("Job post has already closed.");
-        if (jobPosting.Candidates.Any(c => c.Id == command.CandidateId))
+        if (jobPosting.Candidates.Any(c => c.CandidateId == command.CandidateId && c.Status == ApplicationStatus.Applied))
             throw new ArgumentException("Candidate has already applied to this job post.");
         
         var candidate = new Candidate(command.CandidateId, command.FirstName, command.LastName, command.Email);

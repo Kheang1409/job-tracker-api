@@ -19,6 +19,8 @@ public class GetJobPostsQueryHandler : IRequestHandler<GetJobPostsQuery, IEnumer
         var jobPostings = await _jobPostRepository.GetAllAsync(
             command.Title ?? string.Empty,
             command.CompanyName ?? string.Empty,
+            command.AuthorId ?? string.Empty,
+            command.CandidateId ?? string.Empty,
             command.PageNumber,
             command.Limit);
         return jobPostings;

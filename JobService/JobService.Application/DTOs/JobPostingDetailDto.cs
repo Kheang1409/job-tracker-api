@@ -9,10 +9,12 @@ public class JobPostingDetailDto
     public string CompanyName { get; private set; } = string.Empty;
     public string WorkMode { get; private set; } = string.Empty;
     public string EmploymentType { get; private set; } = string.Empty;
-    public SalaryRangeDto? Salary { get; private set; }
-    public Location? JobLocation { get; private set; }
-    public IEnumerable<SkillDto>? RequirementSkill { get; private set; }
     public int NumberOfOpenings { get; private set; } = 1;
+    public SalaryRangeDto? Salary { get; private set; }
+    public IEnumerable<SkillDto>? RequirementSkills { get; private set; }
+    public string JobDescription { get; private set; } = string.Empty;
+    public Location? JobLocation { get; private set; }
+    public List<CandidateDto> Candidates { get; private set; } = new();
     public string Status { get; private set; } = string.Empty;
     public DateTime CreatedAt { get; private set; }
 
@@ -26,10 +28,12 @@ public class JobPostingDetailDto
             CompanyName = jobPosting.CompanyName,
             WorkMode = jobPosting.WorkMode.ToString(),
             EmploymentType = jobPosting.EmploymentType.ToString(),
-            Salary = jobPosting.SalaryRange is not null ? (SalaryRangeDto)jobPosting.SalaryRange : null,
-            JobLocation = jobPosting.JobLocation,
-            RequirementSkill = jobPosting.RequiredSkills.Select(s => (SkillDto)s),
             NumberOfOpenings = jobPosting.NumberOfOpenings,
+            Salary = jobPosting.SalaryRange is not null ? (SalaryRangeDto)jobPosting.SalaryRange : null,
+            RequirementSkills = jobPosting.RequiredSkills.Select(s => (SkillDto)s),
+            JobDescription = jobPosting.JobDescription,
+            JobLocation = jobPosting.JobLocation,
+            Candidates = jobPosting.Candidates.Select(candidate => (CandidateDto)candidate).ToList(),
             Status = jobPosting.Status.ToString(),
             CreatedAt = jobPosting.CreatedAt
         };

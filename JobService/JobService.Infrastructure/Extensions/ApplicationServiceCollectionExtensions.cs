@@ -19,6 +19,7 @@ using JobTracker.JobService.Application.Candidates.Withdraw.Commands;
 using JobTracker.JobService.Application.Candidates.MoveOn.Commands;
 using JobTracker.JobService.Application.Candidates.Rejected.Commands;
 using JobTracker.JobService.Application.Candidates.Selected.Commands;
+using JobTracker.JobService.Application.JobLocations.Queries.GetJobCount;
 
 namespace JobTracker.JobService.Infrastructure.Extensions;
 
@@ -38,6 +39,8 @@ public static class ApplicationServiceCollectionExtensions
             cfg.RegisterServicesFromAssemblyContaining<DeleteJobPostCommand>();
             cfg.RegisterServicesFromAssemblyContaining<GetJobPostQuery>();
             cfg.RegisterServicesFromAssemblyContaining<GetJobPostsQuery>();
+            cfg.RegisterServicesFromAssemblyContaining<GetJobCountQuery>();
+            
 
             //Skills
             cfg.RegisterServicesFromAssemblyContaining<CreateSkillCommand>();
@@ -66,6 +69,7 @@ public static class ApplicationServiceCollectionExtensions
         services.AddValidatorsFromAssemblyContaining<UpdateJobPostCommandValidator>();
         services.AddValidatorsFromAssemblyContaining<GetJobPostQueryValidator>();
         services.AddValidatorsFromAssemblyContaining<GetJobPostsQueryValidator>();
+        services.AddValidatorsFromAssemblyContaining<GetJobCountQueryValidator>();
 
         //Skills
         services.AddValidatorsFromAssemblyContaining<CreateSkillCommandValidator>();

@@ -19,9 +19,7 @@ public class WithdrawCommandHandler : IRequestHandler<WithdrawCommand, bool>
     
     public async Task<bool> Handle(WithdrawCommand command, CancellationToken cancellationToken)
     {
-        var jobPosting = await _jobPostRepository.GetByIdAsync(command.JobPostId);
-        var candidate = jobPosting.Candidates.SingleOrDefault(c => c.Id == command.CandidateId)
-            ?? throw new UnauthorizedAccessException("User is not authorized to withdraw this applicaiton");
+        var candidate = await _candidateRepository.GetByIdAsync(command.JobPostId, command.CandidateId);
         candidate.Withdraw();
         return await _candidateRepository.UpdateAsync(command.JobPostId, command.CandidateId, candidate);
     }

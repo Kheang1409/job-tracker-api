@@ -28,9 +28,9 @@ public class RejectedCommandHandler : IRequestHandler<RejectedCommand, bool>
     public async Task<bool> Handle(RejectedCommand command, CancellationToken cancellationToken)
     {
         var jobPosting = await _jobPostRepository.GetByIdAsync(command.JobPostId);
-        if (jobPosting.AutherId != command.AuthorId)
+        if (jobPosting.AuthorId != command.AuthorId)
             throw new UnauthorizedAccessException("User is not authorized");
-        var candidate = jobPosting.Candidates.SingleOrDefault(c => c.Id == command.CandidateId && c.Status == ApplicationStatus.Applied)
+        var candidate = jobPosting.Candidates.SingleOrDefault(c => c.CandidateId == command.CandidateId && c.Status == ApplicationStatus.Applied)
             ?? throw new NotFoundException("Candidate not found");
 
         candidate.Rejected();

@@ -1,10 +1,15 @@
 using JobTracker.JobService.Domain.Enums;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace JobTracker.JobService.Domain.Entities;
 
 public class Candidate
 {
+    [BsonId]
+    [BsonRepresentation(BsonType.ObjectId)]
     public string Id { get; private set; } = string.Empty;
+    public string CandidateId { get; private set; } = string.Empty;
     public string FirstName { get; private set; } = string.Empty;
     public string LastName { get; private set; } = string.Empty;
     public string Email { get; private set; } = string.Empty;
@@ -14,9 +19,10 @@ public class Candidate
 
     public Candidate() { }
 
-    public Candidate(string id, string firstName, string lastName, string email)
+    public Candidate(string candidateId, string firstName, string lastName, string email)
     {
-        Id = id;
+        Id = ObjectId.GenerateNewId().ToString();
+        CandidateId = candidateId;
         FirstName = firstName;
         LastName = lastName;
         Email = email;
@@ -27,6 +33,12 @@ public class Candidate
     public void Withdraw()
     {
         Status = ApplicationStatus.Withdrawn;
+    }
+
+    public void Apply()
+    {
+        Status = ApplicationStatus.Applied;
+        AppliedAt = DateTime.UtcNow;
     }
 
     public void MoveOn(string name, DateTime dateTime)

@@ -9,7 +9,7 @@ public class JobPosting
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
     public string Id { get; private set; } = string.Empty;
-    public string AutherId { get; private set; } = string.Empty;
+    public string AuthorId { get; private set; } = string.Empty;
     public string Title { get; private set; } = string.Empty;
     public string CompanyName { get; private set; } = string.Empty;
     public WorkMode WorkMode { get; private set; }
@@ -28,7 +28,7 @@ public class JobPosting
     public JobPosting() { }
 
     private JobPosting(
-        string autherId,
+        string authorId,
         string title,
         string companyName,
         WorkMode workMode,
@@ -43,7 +43,7 @@ public class JobPosting
     )
     {
         Id = ObjectId.GenerateNewId().ToString();
-        AutherId = autherId;
+        AuthorId = authorId;
         Title = title;
         CompanyName = companyName;
         WorkMode = workMode;
@@ -58,7 +58,7 @@ public class JobPosting
         CreatedAt = DateTime.UtcNow;
     }
     public static JobPosting Create(
-        string autherId,
+        string authorId,
         string title,
         string companyName,
         WorkMode workMode,
@@ -73,7 +73,7 @@ public class JobPosting
     )
     {
         return new JobPosting(
-            autherId,
+            authorId,
             title,
             companyName,
             workMode,

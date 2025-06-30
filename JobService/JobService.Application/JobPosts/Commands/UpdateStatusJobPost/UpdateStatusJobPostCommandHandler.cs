@@ -20,7 +20,7 @@ public class UpdateStatusJobPostCommandHandler : IRequestHandler<UpdateStatusJob
     {
         var jobPosting = await _jobPostRepository.GetByIdAsync(command.JobPostId);
         jobPosting.UpdateStatus(EnumParser.Status(command.Status));
-        if (jobPosting.AutherId != command.UserId)
+        if (jobPosting.AuthorId != command.UserId)
             throw new UnauthorizedAccessException();
         return await _jobPostRepository.UpdateAsync(jobPosting);
     }

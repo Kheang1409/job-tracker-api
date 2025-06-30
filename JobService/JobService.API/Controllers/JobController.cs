@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using MediatR;
 using JobTracker.JobService.Application.JobLocations.Commands.UpdateJobLocation;
+using JobTracker.JobService.Application.JobLocations.Queries.GetJobCount;
 
 namespace JobService.Controllers;
 
@@ -24,6 +25,14 @@ public class JobController : ControllerBase
     public JobController(IMediator mediator)
     {
         _mediator = mediator;
+    }
+
+    [AllowAnonymous]
+    [HttpGet("total")]
+    public async Task<IActionResult> GetJobs([FromQuery] GetJobCountQuery query)
+    {
+        var count = await _mediator.Send(query);
+        return Ok(count);
     }
 
     [AllowAnonymous]
@@ -124,6 +133,16 @@ public class JobController : ControllerBase
         await _mediator.Send(commandId);
         return NoContent();
     }
+
+    [Route("me")]
+    [HttpGet]
+    public async Task<IActionResult> MyJobs(string id)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new UnauthorizedAccessException();
+        await _mediator.Send(new DeleteJobPostCommand(userId, id));
+        return NoContent();
+    }
+
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteJob(string id)

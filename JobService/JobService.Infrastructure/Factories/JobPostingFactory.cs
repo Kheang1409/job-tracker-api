@@ -7,7 +7,7 @@ namespace JobTracker.JobService.Infrastructure.Factories;
 public class JobPostFactory : IJobPostFactory
 {
     public JobPosting Create(
-        string autherId,
+        string authorId,
         string title,
         string companyName,
         string workMode,
@@ -31,7 +31,7 @@ public class JobPostFactory : IJobPostFactory
         var salary = SalaryRange.Create(minSalary, maxSalary, EnumParser.Currency(currency));
         var jobLocation = Location.Create(address, postalCode, city, county, state, country);
         return JobPosting.Create(
-            autherId,
+            authorId,
             title,
             companyName,
             EnumParser.WorkMode(workMode),

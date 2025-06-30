@@ -5,6 +5,7 @@ namespace JobTracker.JobService.Application.DTOs;
 public class CandidateDto
 {
     public string Id { get; private set; } = string.Empty;
+    public string CandidateId { get; private set; } = string.Empty;
     public string FirstName { get; private set; } = string.Empty;
     public string LastName { get; private set; } = string.Empty;
     public string Email { get; private set; } = string.Empty;
@@ -18,6 +19,7 @@ public class CandidateDto
         return new CandidateDto
         {
             Id = candidate.Id,
+            CandidateId = candidate.CandidateId,
             FirstName = candidate.FirstName,
             LastName = candidate.LastName,
             Email = candidate.Email,

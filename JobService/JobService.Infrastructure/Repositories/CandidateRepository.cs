@@ -2,6 +2,7 @@ using JobTracker.JobService.Application.Repositories;
 using JobTracker.JobService.Domain.Entities;
 using JobTracker.JobService.Domain.Enums;
 using JobTracker.SharedKernel.Exceptions;
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace JobTracker.JobService.Infrastructure.Repositories;
@@ -21,7 +22,7 @@ public class CandidateRepository : ICandidateRepository
     {
         var filter = Builders<JobPosting>.Filter.Eq(j => j.Id, JobPostId);
         var projection = Builders<JobPosting>.Projection
-            .ElemMatch(j => j.Candidates, c => c.Id == CandidateId && c.Status != ApplicationStatus.Withdrawn)
+            .ElemMatch(j => j.Candidates, c => c.CandidateId == CandidateId && c.Status == ApplicationStatus.Applied)
             .Exclude("_id");
 
         var result = await _jobPosts.Find(filter)
@@ -37,7 +38,7 @@ public class CandidateRepository : ICandidateRepository
     {
         var JobPostingFilter = Builders<JobPosting>.Filter.Eq(j => j.Id, JobPostId);
         var projection = Builders<JobPosting>.Projection
-            .ElemMatch(j => j.Candidates, c => c.Status != ApplicationStatus.Withdrawn)
+            .ElemMatch(j => j.Candidates, c => c.Status == ApplicationStatus.Applied)
             .Exclude("_id");
 
         var JobPosting = await _jobPosts.Find(JobPostingFilter)
@@ -55,18 +56,18 @@ public class CandidateRepository : ICandidateRepository
         var result = await _jobPosts.UpdateOneAsync(filter, addCandidate);
         if (result.MatchedCount == 0)
             throw new NotFoundException("JobPosting not found");
-        return Candidate.Id;
+        return Candidate.CandidateId;
     }
     public async Task<bool> UpdateAsync(string JobPostId, string CandidateId, Candidate Candidate)
     {
         var filter = Builders<JobPosting>.Filter.And(
             Builders<JobPosting>.Filter.Eq(j => j.Id, JobPostId),
-            Builders<JobPosting>.Filter.ElemMatch(j => j.Candidates, s => s.Id == Candidate.Id)
+            Builders<JobPosting>.Filter.ElemMatch(j => j.Candidates, c => c.CandidateId == Candidate.CandidateId && c.Status == ApplicationStatus.Applied)
         );
-
+        Console.WriteLine($"Dude: {Candidate.ToJson()}");
         var update = Builders<JobPosting>.Update
-            .Set(j => j.Candidates[0].Status, Candidate.Status)
-            .Set(j => j.Candidates[0].Rounds, Candidate.Rounds);
+            .Set("Candidates.$.Status", Candidate.Status)
+            .Set("Candidates.$.Rounds", Candidate.Rounds);
 
         var result = await _jobPosts.UpdateOneAsync(filter, update);
         if (result.MatchedCount == 0)

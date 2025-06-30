@@ -5,7 +5,7 @@ namespace JobTracker.JobService.Domain.Factories;
 public interface IJobPostFactory
 {
     JobPosting Create(
-        string autherId,
+        string authorId,
         string title,
         string companyName,
         string workMode,

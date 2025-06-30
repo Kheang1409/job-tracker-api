@@ -3,7 +3,6 @@ using JobTracker.JobService.Application.Candidates.Applied.Commands;
 using JobTracker.JobService.Application.Candidates.Queries.GetCandidates;
 using JobTracker.JobService.Application.Candidates.Queries.GetCandidate;
 using Microsoft.AspNetCore.Authorization;
-using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using MediatR;

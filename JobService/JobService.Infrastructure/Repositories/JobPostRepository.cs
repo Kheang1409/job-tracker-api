@@ -1,6 +1,8 @@
 using JobTracker.JobService.Application.Repositories;
 using JobTracker.JobService.Domain.Entities;
+using JobTracker.JobService.Domain.Enums;
 using JobTracker.SharedKernel.Exceptions;
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace JobTracker.JobService.Infrastructure.Repositories;
@@ -20,7 +22,36 @@ public class JobPostRepository : IJobPostRepository
             throw new NotFoundException($"The Job Post unavaliable.");
         return jobPost;
     }
-    public async Task<IEnumerable<JobPosting>> GetAllAsync(string Title, string CompanyName, int PageNumber, int Limit)
+
+    public async Task<int> GetJobCountAsync(string Title, string CompanyName,  string AuthorId, string CandidateId)
+    {
+        var filterBuilder = Builders<JobPosting>.Filter;
+        var filters = new List<FilterDefinition<JobPosting>>();
+
+        if (!string.IsNullOrWhiteSpace(Title))
+        {
+            filters.Add(filterBuilder.Regex(u => u.Title, new BsonRegularExpression(Title, "i")));
+        }
+        if (!string.IsNullOrWhiteSpace(CompanyName))
+        {
+            filters.Add(filterBuilder.Regex(u => u.CompanyName, new BsonRegularExpression(CompanyName, "i")));
+        }
+        if (!string.IsNullOrWhiteSpace(AuthorId))
+        {
+            filters.Add(filterBuilder.Eq(u => u.AuthorId, AuthorId));
+        }
+        if (!string.IsNullOrWhiteSpace(CandidateId))
+        {
+            filters.Add(filterBuilder.ElemMatch(u => u.Candidates, c => c.CandidateId == CandidateId && c.Status == ApplicationStatus.Applied));
+        }
+
+        var combinedFilter = filters.Count > 0 ? filterBuilder.And(filters) : FilterDefinition<JobPosting>.Empty;
+
+        var count = await _jobPosts.CountDocumentsAsync(combinedFilter);
+        return (int)count;
+    }
+    
+    public async Task<IEnumerable<JobPosting>> GetAllAsync(string Title, string CompanyName, string AuthorId, string CandidateId, int PageNumber, int Limit)
     {
         var filterBuilder = Builders<JobPosting>.Filter;
         var filters = new List<FilterDefinition<JobPosting>>();
@@ -32,6 +63,14 @@ public class JobPostRepository : IJobPostRepository
         if (!string.IsNullOrWhiteSpace(CompanyName))
         {
             filters.Add(filterBuilder.Regex(u => u.CompanyName, CompanyName));
+        }
+        if (!string.IsNullOrWhiteSpace(AuthorId))
+        {
+            filters.Add(filterBuilder.Eq(u => u.AuthorId, AuthorId));
+        }
+        if (!string.IsNullOrWhiteSpace(CandidateId))
+        {
+            filters.Add(filterBuilder.ElemMatch(u => u.Candidates, c => c.CandidateId == CandidateId && c.Status == ApplicationStatus.Applied));
         }
 
         var combinedFilter = filters.Count > 0 ? filterBuilder.And(filters) : FilterDefinition<JobPosting>.Empty;
