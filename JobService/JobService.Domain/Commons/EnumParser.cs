@@ -5,18 +5,6 @@ namespace JobTracker.JobService.Domain.Commons;
 public class EnumParser
 {
 
-    public static Currency Currency(string input)
-    {
-        try
-        {
-            return (Currency)Enum.Parse(typeof(Currency), input, true);
-        }
-        catch (ArgumentException)
-        {
-            throw new InvalidOperationException("Invalid currency code");
-        }
-    }
-
     public static JobPostStatus Status(string input)
     {
         try

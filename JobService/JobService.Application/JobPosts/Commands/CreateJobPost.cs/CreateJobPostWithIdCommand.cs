@@ -16,11 +16,9 @@ public record CreateJobPostWithIdCommand(
     string Currency,
     List<Skill> RequiredSkills,
     string JobDescription,
-    string Address,
-    int PostalCode,
-    string City,
-    string County,
-    string State,
     string Country,
-    string Status
+    string Street,
+    string City,
+    string State,
+    int PostalCode
 ): IRequest<string>;

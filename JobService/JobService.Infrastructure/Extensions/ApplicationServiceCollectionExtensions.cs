@@ -8,10 +8,6 @@ using JobTracker.JobService.Application.JobLocations.Queries.GetJobPosts;
 using JobTracker.JobService.Application.JobLocations.Commands.UpdateJobPost;
 using JobTracker.JobService.Application.JobLocations.Commands.DeleteJobPost;
 using JobTracker.JobService.Application.JobLocations.Commands.UpdateStatusJobPost;
-using JobTracker.JobService.Application.Skills.Commands.CreateSkill;
-using JobTracker.JobService.Application.Skills.Commands.DeleteSkill;
-using JobTracker.JobService.Application.Skills.Queries.GetSkill;
-using JobTracker.JobService.Application.Skills.Queries.GetSkills;
 using JobTracker.JobService.Application.Candidates.Applied.Commands;
 using JobTracker.JobService.Application.Candidates.Queries.GetCandidate;
 using JobTracker.JobService.Application.Candidates.Queries.GetCandidates;
@@ -42,13 +38,6 @@ public static class ApplicationServiceCollectionExtensions
             cfg.RegisterServicesFromAssemblyContaining<GetJobCountQuery>();
             
 
-            //Skills
-            cfg.RegisterServicesFromAssemblyContaining<CreateSkillCommand>();
-            cfg.RegisterServicesFromAssemblyContaining<CreateSkillWithIdCommand>();
-            cfg.RegisterServicesFromAssemblyContaining<DeleteSkillCommand>();
-            cfg.RegisterServicesFromAssemblyContaining<GetSkillQuery>();
-            cfg.RegisterServicesFromAssemblyContaining<GetSkillsQuery>();
-
             //Candidates
             cfg.RegisterServicesFromAssemblyContaining<AppliedCommand>();
             cfg.RegisterServicesFromAssemblyContaining<WithdrawCommand>();
@@ -70,12 +59,6 @@ public static class ApplicationServiceCollectionExtensions
         services.AddValidatorsFromAssemblyContaining<GetJobPostQueryValidator>();
         services.AddValidatorsFromAssemblyContaining<GetJobPostsQueryValidator>();
         services.AddValidatorsFromAssemblyContaining<GetJobCountQueryValidator>();
-
-        //Skills
-        services.AddValidatorsFromAssemblyContaining<CreateSkillCommandValidator>();
-        services.AddValidatorsFromAssemblyContaining<DeleteSkillCommandValidator>();
-        services.AddValidatorsFromAssemblyContaining<GetSkillQueryValidator>();
-        services.AddValidatorsFromAssemblyContaining<GetSkillsQueryValidator>();
 
         //Candidate
         services.AddValidatorsFromAssemblyContaining<AppliedCommandValidator>();

@@ -45,8 +45,8 @@ public class CreateJobPostCommandValidator : AbstractValidator<CreateJobPostComm
         RuleFor(x => x.JobDescription)
             .NotEmpty().WithMessage("Job description is required.");
 
-        RuleFor(x => x.Address)
-            .NotEmpty().WithMessage("Address is required.");
+        RuleFor(x => x.Street)
+            .NotEmpty().WithMessage("Street is required.");
 
         RuleFor(x => x.PostalCode)
             .GreaterThan(0).WithMessage("Postal code must be a positive number.");
@@ -54,16 +54,10 @@ public class CreateJobPostCommandValidator : AbstractValidator<CreateJobPostComm
         RuleFor(x => x.City)
             .NotEmpty().WithMessage("City is required.");
 
-        RuleFor(x => x.County)
-            .NotEmpty().WithMessage("County is required.");
-
         RuleFor(x => x.State)
             .NotEmpty().WithMessage("State is required.");
 
         RuleFor(x => x.Country)
             .NotEmpty().WithMessage("Country is required.");
-
-        RuleFor(x => x.Status)
-            .NotEmpty().WithMessage("Status is required.");
     }
 }

@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using MediatR;
-using JobTracker.JobService.Application.JobLocations.Commands.UpdateJobLocation;
 using JobTracker.JobService.Application.JobLocations.Queries.GetJobCount;
 
 namespace JobService.Controllers;
@@ -70,13 +69,11 @@ public class JobController : ControllerBase
             command.Currency,
             command.RequiredSkills.Select(s => Skill.Create(s.Name)).ToList(),
             command.JobDescription,
-            command.Address,
-            command.PostalCode,
+            command.Street,
             command.City,
-            command.County,
             command.State,
             command.Country,
-            command.Status
+            command.PostalCode
         );
         var jobPostId = await _mediator.Send(commandWithId);
         return CreatedAtAction(nameof(GetJobById), new { id = jobPostId }, commandWithId);
@@ -97,7 +94,16 @@ public class JobController : ControllerBase
             command.EmploymentType,
             command.NumberOfOpenings,
             command.MinExperience,
-            command.JobDescription
+            command.MinSalary,
+            command.MaxSalary,
+            command.Currency,
+            command.RequiredSkills.Select(s => Skill.Create(s.Name)).ToList(),
+            command.JobDescription,
+            command.Street,
+            command.City,
+            command.State,
+            command.Country,
+            command.PostalCode
         );
         await _mediator.Send(commandWithId);
         return NoContent();
@@ -113,33 +119,6 @@ public class JobController : ControllerBase
             command.Status
         );
         await _mediator.Send(commandId);
-        return NoContent();
-    }
-
-    [HttpPut("{id}/location")]
-    public async Task<IActionResult> UpdateJobStatus(string id, [FromBody] UpdateJobLocationCommand command)
-    {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new UnauthorizedAccessException();
-        var commandId = new UpdateJobLocationWithIdCommand(
-            userId,
-            id,
-            command.Address,
-            command.PostalCode,
-            command.City,
-            command.County,
-            command.State,
-            command.Country
-        );
-        await _mediator.Send(commandId);
-        return NoContent();
-    }
-
-    [Route("me")]
-    [HttpGet]
-    public async Task<IActionResult> MyJobs(string id)
-    {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new UnauthorizedAccessException();
-        await _mediator.Send(new DeleteJobPostCommand(userId, id));
         return NoContent();
     }
 

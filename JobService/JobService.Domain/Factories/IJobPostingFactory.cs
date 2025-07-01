@@ -17,12 +17,10 @@ public interface IJobPostFactory
         string currency,
         List<Skill> requiredSkills,
         string jobDescription,
-        string address,
-        int postalCode,
+        string street,
         string city,
-        string county,
         string state,
         string country,
-        string status
+        int postalCode
     );
 }

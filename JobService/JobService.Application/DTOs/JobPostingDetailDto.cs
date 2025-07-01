@@ -5,15 +5,17 @@ namespace JobTracker.JobService.Application.DTOs;
 public class JobPostingDetailDto
 {
     public string Id { get; private set; } = string.Empty;
+    public string AuthorId { get; private set; } = string.Empty;
     public string Title { get; private set; } = string.Empty;
     public string CompanyName { get; private set; } = string.Empty;
     public string WorkMode { get; private set; } = string.Empty;
     public string EmploymentType { get; private set; } = string.Empty;
     public int NumberOfOpenings { get; private set; } = 1;
+    public int MinExperience { get; private set; } = 0;
     public SalaryRangeDto? Salary { get; private set; }
     public IEnumerable<SkillDto>? RequirementSkills { get; private set; }
     public string JobDescription { get; private set; } = string.Empty;
-    public Location? JobLocation { get; private set; }
+    public Address? JobLocation { get; private set; }
     public List<CandidateDto> Candidates { get; private set; } = new();
     public string Status { get; private set; } = string.Empty;
     public DateTime CreatedAt { get; private set; }
@@ -24,11 +26,13 @@ public class JobPostingDetailDto
         return new JobPostingDetailDto
         {
             Id = jobPosting.Id,
+            AuthorId = jobPosting.AuthorId,
             Title = jobPosting.Title,
             CompanyName = jobPosting.CompanyName,
             WorkMode = jobPosting.WorkMode.ToString(),
             EmploymentType = jobPosting.EmploymentType.ToString(),
             NumberOfOpenings = jobPosting.NumberOfOpenings,
+            MinExperience = jobPosting.MinExperience,
             Salary = jobPosting.SalaryRange is not null ? (SalaryRangeDto)jobPosting.SalaryRange : null,
             RequirementSkills = jobPosting.RequiredSkills.Select(s => (SkillDto)s),
             JobDescription = jobPosting.JobDescription,

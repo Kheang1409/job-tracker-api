@@ -1,4 +1,5 @@
 using JobTracker.JobService.Application.Repositories;
+using JobTracker.JobService.Domain.Commons;
 using MediatR;
 
 namespace JobTracker.JobService.Application.JobLocations.Commands.UpdateJobPost;
@@ -21,9 +22,20 @@ public class UpdateJobPostCommandHandler : IRequestHandler<UpdateJobPostWithIdCo
         updateJobPosting.Update(
             command.Title,
             command.CompanyName,
+            command.WorkMode,
+            command.EmploymentType,
             command.NumberOfOpenings,
             command.MinExperience,
-            command.JobDescription
+            command.MinSalary,
+            command.MaxSalary,
+            command.Currency,
+            command.RequiredSkills,
+            command.JobDescription,
+            command.Street,
+            command.City,
+            command.State,
+            command.Country,
+            command.PostalCode
         );
         return await _jobPostRepository.UpdateAsync(updateJobPosting);
     }

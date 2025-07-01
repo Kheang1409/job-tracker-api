@@ -10,7 +10,7 @@ public class JobPostingDto
     public string WorkMode { get; private set; } = string.Empty;
     public string EmploymentType { get; private set; } = string.Empty;
     public SalaryRangeDto? Salary { get; private set; }
-    public Location? JobLocation { get; private set; }
+    public Address? JobLocation { get; private set; }
     public int NumberOfOpenings { get; private set; } = 1;
     public string Status { get; private set; } = string.Empty;
     public DateTime CreatedAt { get; private set; }

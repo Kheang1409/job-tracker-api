@@ -1,3 +1,4 @@
+using JobTracker.JobService.Domain.Commons;
 using JobTracker.JobService.Domain.Enums;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
@@ -19,7 +20,7 @@ public class JobPosting
     public SalaryRange? SalaryRange { get; private set; }
     public List<Skill> RequiredSkills { get; private set; } = new();
     public string JobDescription { get; private set; } = string.Empty;
-    public Location? JobLocation { get; private set; }
+    public Address? JobLocation { get; private set; }
     public List<Candidate> Candidates { get; private set; } = new();
     public JobPostStatus Status { get; private set; }
     public DateTime CreatedAt { get; private set; }
@@ -38,8 +39,7 @@ public class JobPosting
         SalaryRange salaryRange,
         List<Skill> requiredSkills,
         string jobDescription,
-        Location jobLocation,
-        JobPostStatus status
+        Address jobLocation
     )
     {
         Id = ObjectId.GenerateNewId().ToString();
@@ -54,7 +54,7 @@ public class JobPosting
         RequiredSkills = requiredSkills;
         JobDescription = jobDescription;
         JobLocation = jobLocation;
-        Status = status;
+        Status = JobPostStatus.Active;
         CreatedAt = DateTime.UtcNow;
     }
     public static JobPosting Create(
@@ -68,8 +68,7 @@ public class JobPosting
         SalaryRange salaryRange,
         List<Skill> requiredSkills,
         string jobDescription,
-        Location jobLocation,
-        JobPostStatus status
+        Address jobLocation
     )
     {
         return new JobPosting(
@@ -83,21 +82,36 @@ public class JobPosting
             salaryRange,
             requiredSkills,
             jobDescription,
-            jobLocation,
-            status);
+            jobLocation);
     }
 
     public void Update(
         string title,
         string companyName,
+        string workMode,
+        string employmentType,
         int numberOfOpenings,
         int minExperience,
-        string jobDescription)
+        int minSalary,
+        int maxSalary,
+        string currency ,
+        List<Skill> requiredSkills,
+        string jobDescription,
+        string street,
+        string city,
+        string state,
+        string country,
+        int postalCode)
     {
         Title = title;
         CompanyName = companyName;
+        WorkMode = EnumParser.WorkMode(workMode);
+        EmploymentType = EnumParser.EmploymentType(employmentType);
         NumberOfOpenings = numberOfOpenings;
         MinExperience = minExperience;
+        SalaryRange?.Update(minSalary, maxSalary, currency);
+        JobLocation?.Update(country, street, city, state, postalCode);
+        RequiredSkills = requiredSkills;
         JobDescription = jobDescription;
         UpdatedAt = DateTime.UtcNow;
     }

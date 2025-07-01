@@ -12,9 +12,9 @@ public class SalaryRangeDto
     {
         return new SalaryRangeDto
         {
-            MinSalary = salaryRange.MaxSalary,
+            MinSalary = salaryRange.MinSalary,
             MaxSalary = salaryRange.MaxSalary,
-            Currency = salaryRange.Currency.ToString()
+            Currency = salaryRange.Currency
         };
     }
 }

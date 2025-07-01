@@ -23,66 +23,107 @@ public class JobPostRepository : IJobPostRepository
         return jobPost;
     }
 
-    public async Task<int> GetJobCountAsync(string Title, string CompanyName,  string AuthorId, string CandidateId)
+    public async Task<int> GetJobCountAsync(
+        string Title,
+        string CompanyName,
+        string AuthorId,
+        string CandidateId
+    )
     {
         var filterBuilder = Builders<JobPosting>.Filter;
-        var filters = new List<FilterDefinition<JobPosting>>();
+
+        var andFilters = new List<FilterDefinition<JobPosting>>();
 
         if (!string.IsNullOrWhiteSpace(Title))
         {
-            filters.Add(filterBuilder.Regex(u => u.Title, new BsonRegularExpression(Title, "i")));
+            andFilters.Add(filterBuilder.Regex(u => u.Title, new BsonRegularExpression(Title, "i")));
         }
         if (!string.IsNullOrWhiteSpace(CompanyName))
         {
-            filters.Add(filterBuilder.Regex(u => u.CompanyName, new BsonRegularExpression(CompanyName, "i")));
+            andFilters.Add(filterBuilder.Regex(u => u.CompanyName, new BsonRegularExpression(CompanyName, "i")));
         }
+
+        var orFilters = new List<FilterDefinition<JobPosting>>();
+
         if (!string.IsNullOrWhiteSpace(AuthorId))
         {
-            filters.Add(filterBuilder.Eq(u => u.AuthorId, AuthorId));
+            orFilters.Add(filterBuilder.Eq(u => u.AuthorId, AuthorId));
         }
+
         if (!string.IsNullOrWhiteSpace(CandidateId))
         {
-            filters.Add(filterBuilder.ElemMatch(u => u.Candidates, c => c.CandidateId == CandidateId && c.Status == ApplicationStatus.Applied));
+            orFilters.Add(filterBuilder.ElemMatch(u => u.Candidates, c => c.CandidateId == CandidateId && c.Status == ApplicationStatus.Applied));
         }
 
-        var combinedFilter = filters.Count > 0 ? filterBuilder.And(filters) : FilterDefinition<JobPosting>.Empty;
+        if (orFilters.Count > 0)
+        {
+            andFilters.Add(filterBuilder.Or(orFilters));
+        }
 
-        var count = await _jobPosts.CountDocumentsAsync(combinedFilter);
+        var finalFilter = andFilters.Count > 0
+            ? filterBuilder.And(andFilters)
+            : FilterDefinition<JobPosting>.Empty;
+
+        var count = await _jobPosts.CountDocumentsAsync(finalFilter);
         return (int)count;
     }
+
+
     
-    public async Task<IEnumerable<JobPosting>> GetAllAsync(string Title, string CompanyName, string AuthorId, string CandidateId, int PageNumber, int Limit)
+    public async Task<IEnumerable<JobPosting>> GetAllAsync(
+        string Title,
+        string CompanyName,
+        string AuthorId,
+        string CandidateId,
+        int PageNumber,
+        int Limit
+    )
     {
         var filterBuilder = Builders<JobPosting>.Filter;
-        var filters = new List<FilterDefinition<JobPosting>>();
+
+        var andFilters = new List<FilterDefinition<JobPosting>>();
 
         if (!string.IsNullOrWhiteSpace(Title))
         {
-            filters.Add(filterBuilder.Regex(u => u.CompanyName, Title));
+            andFilters.Add(filterBuilder.Regex(u => u.Title, new BsonRegularExpression(Title, "i")));
         }
         if (!string.IsNullOrWhiteSpace(CompanyName))
         {
-            filters.Add(filterBuilder.Regex(u => u.CompanyName, CompanyName));
-        }
-        if (!string.IsNullOrWhiteSpace(AuthorId))
-        {
-            filters.Add(filterBuilder.Eq(u => u.AuthorId, AuthorId));
-        }
-        if (!string.IsNullOrWhiteSpace(CandidateId))
-        {
-            filters.Add(filterBuilder.ElemMatch(u => u.Candidates, c => c.CandidateId == CandidateId && c.Status == ApplicationStatus.Applied));
+            andFilters.Add(filterBuilder.Regex(u => u.CompanyName, new BsonRegularExpression(CompanyName, "i")));
         }
 
-        var combinedFilter = filters.Count > 0 ? filterBuilder.And(filters) : FilterDefinition<JobPosting>.Empty;
+        var orFilters = new List<FilterDefinition<JobPosting>>();
+
+        if (!string.IsNullOrWhiteSpace(AuthorId))
+        {
+            orFilters.Add(filterBuilder.Eq(u => u.AuthorId, AuthorId));
+        }
+
+        if (!string.IsNullOrWhiteSpace(CandidateId))
+        {
+            orFilters.Add(filterBuilder.ElemMatch(u => u.Candidates, c => c.CandidateId == CandidateId && c.Status == ApplicationStatus.Applied));
+        }
+
+        if (orFilters.Count > 0)
+        {
+            andFilters.Add(filterBuilder.Or(orFilters));
+        }
+
+        var finalFilter = andFilters.Count > 0
+            ? filterBuilder.And(andFilters)
+            : FilterDefinition<JobPosting>.Empty;
 
         var skip = (PageNumber - 1) * Limit;
 
-        var jobPosts = await _jobPosts.Find(combinedFilter)
+        var jobPosts = await _jobPosts.Find(finalFilter)
                                     .Skip(skip)
                                     .Limit(Limit)
                                     .ToListAsync();
+
         return jobPosts;
     }
+
+
     public async Task<string> AddAsync(JobPosting JobPosting)
     {
         await _jobPosts.InsertOneAsync(JobPosting);

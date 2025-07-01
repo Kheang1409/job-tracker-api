@@ -19,17 +19,15 @@ public class JobPostFactory : IJobPostFactory
         string currency,
         List<Skill> requiredSkills,
         string jobDescription,
-        string address,
-        int postalCode,
+        string street,
         string city,
-        string county,
         string state,
         string country,
-        string status
+        int postalCode
     )
     {
-        var salary = SalaryRange.Create(minSalary, maxSalary, EnumParser.Currency(currency));
-        var jobLocation = Location.Create(address, postalCode, city, county, state, country);
+        var salary = SalaryRange.Create(minSalary, maxSalary, currency);
+        var jobLocation = Address.Create(country, street, city, state, postalCode);
         return JobPosting.Create(
             authorId,
             title,
@@ -41,7 +39,6 @@ public class JobPostFactory : IJobPostFactory
             salary,
             requiredSkills,
             jobDescription,
-            jobLocation,
-            EnumParser.Status(status));
+            jobLocation);
         }
 }

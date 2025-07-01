@@ -14,13 +14,11 @@ public record CreateJobPostCommand(
     string Currency ,
     List<CreateSkill> RequiredSkills,
     string JobDescription,
-    string Address,
-    int PostalCode,
-    string City,
-    string County,
-    string State,
     string Country,
-    string Status
+    string Street,
+    string City,
+    string State,
+    int PostalCode
 ) : IRequest<string>;
 
 public record CreateSkill(
