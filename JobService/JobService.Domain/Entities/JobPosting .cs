@@ -39,7 +39,8 @@ public class JobPosting
         SalaryRange salaryRange,
         List<Skill> requiredSkills,
         string jobDescription,
-        Address jobLocation
+        Address jobLocation,
+        DateTime expirationDate
     )
     {
         Id = ObjectId.GenerateNewId().ToString();
@@ -56,6 +57,7 @@ public class JobPosting
         JobLocation = jobLocation;
         Status = JobPostStatus.Active;
         CreatedAt = DateTime.UtcNow;
+        ExpirationDate = expirationDate;
     }
     public static JobPosting Create(
         string authorId,
@@ -68,7 +70,8 @@ public class JobPosting
         SalaryRange salaryRange,
         List<Skill> requiredSkills,
         string jobDescription,
-        Address jobLocation
+        Address jobLocation,
+        DateTime expirationDate
     )
     {
         return new JobPosting(
@@ -82,7 +85,8 @@ public class JobPosting
             salaryRange,
             requiredSkills,
             jobDescription,
-            jobLocation);
+            jobLocation,
+            expirationDate);
     }
 
     public void Update(
@@ -94,14 +98,15 @@ public class JobPosting
         int minExperience,
         int minSalary,
         int maxSalary,
-        string currency ,
+        string currency,
         List<Skill> requiredSkills,
         string jobDescription,
         string street,
         string city,
         string state,
         string country,
-        int postalCode)
+        int postalCode,
+        DateTime expirationDate)
     {
         Title = title;
         CompanyName = companyName;
@@ -114,6 +119,7 @@ public class JobPosting
         RequiredSkills = requiredSkills;
         JobDescription = jobDescription;
         UpdatedAt = DateTime.UtcNow;
+        ExpirationDate = expirationDate;
     }
 
     public void UpdateStatus(JobPostStatus status)

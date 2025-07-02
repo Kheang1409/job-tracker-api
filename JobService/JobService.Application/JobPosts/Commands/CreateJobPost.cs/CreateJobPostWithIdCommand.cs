@@ -20,5 +20,6 @@ public record CreateJobPostWithIdCommand(
     string Street,
     string City,
     string State,
-    int PostalCode
+    int PostalCode,
+    DateTime ExpirationDate
 ): IRequest<string>;

@@ -21,5 +21,6 @@ public record UpdateJobPostWithIdCommand(
     string Street,
     string City,
     string State,
-    int PostalCode
+    int PostalCode,
+    DateTime ExpirationDate
 ) : IRequest<bool>;

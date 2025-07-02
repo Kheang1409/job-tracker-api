@@ -73,7 +73,8 @@ public class JobController : ControllerBase
             command.City,
             command.State,
             command.Country,
-            command.PostalCode
+            command.PostalCode,
+            command.ExpirationDate
         );
         var jobPostId = await _mediator.Send(commandWithId);
         return CreatedAtAction(nameof(GetJobById), new { id = jobPostId }, commandWithId);
@@ -103,14 +104,15 @@ public class JobController : ControllerBase
             command.City,
             command.State,
             command.Country,
-            command.PostalCode
+            command.PostalCode,
+            command.ExpirationDate
         );
         await _mediator.Send(commandWithId);
         return NoContent();
     }
 
     [HttpPut("{id}/status")]
-    public async Task<IActionResult> CloseJobPostStatus(string id, [FromBody] UpdateStatusJobPostCommand command)
+    public async Task<IActionResult> UpdateStatusJobPost(string id, [FromBody] UpdateStatusJobPostCommand command)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new UnauthorizedAccessException();
         var commandId = new UpdateStatusJobPostWithIdCommand(

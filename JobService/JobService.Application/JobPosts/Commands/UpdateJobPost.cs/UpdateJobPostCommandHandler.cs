@@ -35,7 +35,8 @@ public class UpdateJobPostCommandHandler : IRequestHandler<UpdateJobPostWithIdCo
             command.City,
             command.State,
             command.Country,
-            command.PostalCode
+            command.PostalCode,
+            command.ExpirationDate
         );
         return await _jobPostRepository.UpdateAsync(updateJobPosting);
     }

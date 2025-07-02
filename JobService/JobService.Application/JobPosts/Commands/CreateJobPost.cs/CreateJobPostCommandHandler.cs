@@ -38,7 +38,8 @@ public class CreateJobPostCommandHandler : IRequestHandler<CreateJobPostWithIdCo
             command.City,
             command.State,
             command.Country,
-            command.PostalCode
+            command.PostalCode,
+            command.ExpirationDate
         );
         var jobPostId = await _jobPostRepository.AddAsync(jobPosting);
         return jobPostId;

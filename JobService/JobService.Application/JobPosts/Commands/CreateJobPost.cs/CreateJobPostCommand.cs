@@ -18,7 +18,8 @@ public record CreateJobPostCommand(
     string Street,
     string City,
     string State,
-    int PostalCode
+    int PostalCode,
+    DateTime ExpirationDate
 ) : IRequest<string>;
 
 public record CreateSkill(

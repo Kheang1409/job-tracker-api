@@ -19,6 +19,8 @@ public class JobPostingDetailDto
     public List<CandidateDto> Candidates { get; private set; } = new();
     public string Status { get; private set; } = string.Empty;
     public DateTime CreatedAt { get; private set; }
+    public DateTime UpdatedAt { get; private set; }
+    public DateTime ExpirationDate { get; private set; }
 
 
     public static explicit operator JobPostingDetailDto(JobPosting jobPosting)
@@ -39,7 +41,9 @@ public class JobPostingDetailDto
             JobLocation = jobPosting.JobLocation,
             Candidates = jobPosting.Candidates.Select(candidate => (CandidateDto)candidate).ToList(),
             Status = jobPosting.Status.ToString(),
-            CreatedAt = jobPosting.CreatedAt
+            CreatedAt = jobPosting.CreatedAt,
+            UpdatedAt = jobPosting.UpdatedAt,
+            ExpirationDate = jobPosting.ExpirationDate
         };
     }
 

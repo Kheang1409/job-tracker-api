@@ -23,7 +23,8 @@ public class JobPostFactory : IJobPostFactory
         string city,
         string state,
         string country,
-        int postalCode
+        int postalCode,
+        DateTime expirationDate
     )
     {
         var salary = SalaryRange.Create(minSalary, maxSalary, currency);
@@ -39,6 +40,7 @@ public class JobPostFactory : IJobPostFactory
             salary,
             requiredSkills,
             jobDescription,
-            jobLocation);
+            jobLocation,
+            expirationDate);
         }
 }

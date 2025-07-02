@@ -14,6 +14,8 @@ public class JobPostingDto
     public int NumberOfOpenings { get; private set; } = 1;
     public string Status { get; private set; } = string.Empty;
     public DateTime CreatedAt { get; private set; }
+    public DateTime UpdatedAt { get; private set; }
+    public DateTime ExpirationDate { get; private set; }
 
 
     public static explicit operator JobPostingDto(JobPosting jobPosting)
@@ -29,7 +31,9 @@ public class JobPostingDto
             JobLocation = jobPosting.JobLocation,
             NumberOfOpenings = jobPosting.NumberOfOpenings,
             Status = jobPosting.Status.ToString(),
-            CreatedAt = jobPosting.CreatedAt
+            CreatedAt = jobPosting.CreatedAt,
+            UpdatedAt = jobPosting.UpdatedAt,
+            ExpirationDate = jobPosting.ExpirationDate
         };
     }
 }

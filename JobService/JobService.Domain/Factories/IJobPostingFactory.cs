@@ -21,6 +21,7 @@ public interface IJobPostFactory
         string city,
         string state,
         string country,
-        int postalCode
+        int postalCode,
+        DateTime expirationDate
     );
 }
