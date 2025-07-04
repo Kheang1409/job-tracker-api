@@ -16,7 +16,7 @@ public class User
     public string Bio { get; private set; } = string.Empty;
     public Gender Gender { get; private set; }
     public string Email { get; private set; } = string.Empty;
-    public string PhoneNumber { get; private set; } = string.Empty;
+    public ContactNumber? ContactNumber { get; private set; }
     public string PasswordHash { get; private set; } = string.Empty;
     public string OTP { get; private set; } = string.Empty;
     public DateTime ExpireDate { get; private set; }
@@ -50,7 +50,11 @@ public class User
         Address = address ?? throw new ArgumentNullException(nameof(address), "Address cannot be null");
     }
 
-    public void Update(string firstName, string lastName, string bio, Gender gender, string email, string phoneNumber)
+    public void SetContactNumber(ContactNumber contactNumber) {
+        ContactNumber = contactNumber ?? throw new ArgumentNullException(nameof(contactNumber), "Contact Number cannot be null"); ;
+    }
+
+    public void Update(string firstName, string lastName, string bio, Gender gender, string email, List<Skill> skills)
     {
         Email = email;
         FirstName = firstName;
@@ -58,13 +62,8 @@ public class User
         Bio = bio;
         Gender = gender;
         Email = email;
-        PhoneNumber = phoneNumber;
+        Skills = skills;
         ModifiedAt = DateTime.UtcNow;
-    }
-
-    public static string NormalizePhoneNumber(string phone)
-    {
-        return new string(phone.Where(char.IsDigit).ToArray());
     }
 
     private string Hash(string password)

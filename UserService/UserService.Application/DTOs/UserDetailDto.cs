@@ -10,9 +10,9 @@ public class UserDetailDto
     public string Bio { get; private set; } = string.Empty;
     public string Gender { get; private set; } = string.Empty;
     public string Email { get; private set; } = string.Empty;
-    public string PhoneNumber { get; private set; } = string.Empty;
+    public ContactNumber? ContactNumber { get; private set; }
     public Address? Address { get; private set; }
-    public IEnumerable<Skill>? Skills { get; private set; }
+    public IEnumerable<SkillDto>? Skills { get; private set; }
     public IEnumerable<Experience>? Experiences { get; private set; }
     public IEnumerable<Project>? Projects { get; private set; }
 
@@ -20,16 +20,30 @@ public class UserDetailDto
     {
         return new UserDetailDto
         {
+            Id = user.Id,
             FirstName = user.FirstName,
             LastName = user.LastName,
             Bio = user.Bio,
             Gender = user.Gender.ToString(),
             Email = user.Email,
-            PhoneNumber = user.PhoneNumber,
-            Skills = user.Skills,
+            ContactNumber = user.ContactNumber,
+            Skills = user.Skills.Select(skill => (SkillDto)skill),
             Address = user.Address,
             Experiences = user.Experiences,
-            Projects= user.Projects
+            Projects = user.Projects
         };
+    }
+    
+    public class SkillDto
+    {
+        public string Name { get; private set; } = string.Empty;
+
+        public static explicit operator SkillDto(Skill skill)
+        {
+            return new SkillDto
+            {
+                Name = skill.Name
+            };
+        }
     }
 }

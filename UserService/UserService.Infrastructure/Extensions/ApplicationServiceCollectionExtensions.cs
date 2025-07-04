@@ -2,12 +2,6 @@ using JobTracker.UserService.Application.Auths.Commands.Login;
 using JobTracker.UserService.Application.Auths.Commands.ResetPassword;
 using JobTracker.UserService.Application.Auths.Commands.ForgotPassword;
 
-using JobTracker.UserService.Application.Skills.Commands.CreateSkill;
-using JobTracker.UserService.Application.Skills.Commands.DeleteSkill;
-using JobTracker.UserService.Application.Skills.Commands.UpdateSkill;
-using JobTracker.UserService.Application.Skills.Queries.GetSkills;
-using JobTracker.UserService.Application.Skills.Queries.GetSkill;
-
 using JobTracker.UserService.Application.Users.Commands.CreateUser;
 using JobTracker.UserService.Application.Users.Commands.DeleteUser;
 using JobTracker.UserService.Application.Users.Commands.UpdateUser;
@@ -53,17 +47,6 @@ public static class ApplicationServiceCollectionExtensions
             cfg.RegisterServicesFromAssemblyContaining<GetUserProfileQuery>();
             cfg.RegisterServicesFromAssemblyContaining<GetUsersQuery>();
 
-
-            //Skill
-            cfg.RegisterServicesFromAssemblyContaining<CreateSkillCommand>();
-            cfg.RegisterServicesFromAssemblyContaining<CreateSkillWithIdCommand>();
-            cfg.RegisterServicesFromAssemblyContaining<UpdateSkillCommand>();
-            cfg.RegisterServicesFromAssemblyContaining<UpdateSkillWithIdCommand>();
-            cfg.RegisterServicesFromAssemblyContaining<DeleteSkillCommand>();
-
-            cfg.RegisterServicesFromAssemblyContaining<GetSkillQuery>();
-            cfg.RegisterServicesFromAssemblyContaining<GetSkillsQuery>();
-
             //Project
             cfg.RegisterServicesFromAssemblyContaining<CreateProjectCommand>();
             cfg.RegisterServicesFromAssemblyContaining<CreateProjectWithIdCommand>(); 
@@ -83,12 +66,6 @@ public static class ApplicationServiceCollectionExtensions
         services.AddValidatorsFromAssemblyContaining<LoginCommandValidator>();
         services.AddValidatorsFromAssemblyContaining<ForgotPasswordCommandValidator>();
         services.AddValidatorsFromAssemblyContaining<ResetPasswordCommandValidator>();
-
-        //Skill
-        services.AddValidatorsFromAssemblyContaining<CreateSkillCommandValidator>();
-        services.AddValidatorsFromAssemblyContaining<DeleteSkillCommandValidator>();
-        services.AddValidatorsFromAssemblyContaining<GetSkillQueryValidator>();
-        services.AddValidatorsFromAssemblyContaining<GetSkillsQueryValidator>();
 
         // Project
         services.AddValidatorsFromAssemblyContaining<CreateProjectCommandValidator>();

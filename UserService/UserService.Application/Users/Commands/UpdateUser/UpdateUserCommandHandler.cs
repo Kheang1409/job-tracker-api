@@ -26,28 +26,22 @@ public class UpdateUserCommandHandler : IRequestHandler<UpdateUserWithIdCommand,
             command.Bio,
             EnumParser.Gender(command.Gender),
             command.Email,
-            command.PhoneNumber
+            command.Skills.Select(s => Skill.Create(s.Name)).ToList()
         );
-        if (user.Address is null)
-        {
-            var address = Address.Create(
+        var address = Address.Create(
                 command.Country,
                 command.Street,
                 command.City,
                 command.State,
                 command.PostalCode
             );
-            user.SetAddress(address);
-        }
-        else
-        {
-            user.Address?.Update(
-            command.Country,
-            command.Street,
-            command.City,
-            command.State,
-            command.PostalCode);
-        }
+        var contactNumber = ContactNumber.Create(
+            command.CountryCode,
+            command.PhoneNumber
+            );
+            
+        user.SetAddress(address);
+        user.SetContactNumber(contactNumber);
         
         return await _userRepository.UpdateAsync(user);
     }
