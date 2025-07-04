@@ -17,6 +17,7 @@ public class GetCandidatesQueryHandler : IRequestHandler<GetCandidatesWithIdQuer
     public async Task<IEnumerable<Candidate>> Handle(GetCandidatesWithIdQuery query, CancellationToken cancellationToken)
     {
         var jobPostings = await _candidateRepository.GetAllAsync(
+            query.AuthorId,
             query.JobPostId,
             query.PageNumber,
             query.Limit);

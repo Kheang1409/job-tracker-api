@@ -5,21 +5,21 @@ namespace JobTracker.JobService.Domain.Entities;
 public class Stage
 {
     public string Name { get; private set; } = string.Empty;
-    public DateTime AppointmentDate { get; private set; }
+    public DateTime? AppointmentDate { get; private set; } = null;
     public StageStatus Status { get; private set; } = StageStatus.Processing;
     public string Remarked { get; private set; } = string.Empty;
 
     public Stage() { }
 
-    private Stage(string name, DateTime appointmentDate)
+    private Stage(string name, DateTime? appointmentDate)
     {
         Name = name;
         AppointmentDate = appointmentDate;
     }
 
-    public static Stage Create(string name, DateTime? appointmentDate = null)
+    public static Stage Create(string name, DateTime? appointmentDate)
     {
-        return new Stage(name, appointmentDate ?? default(DateTime));
+        return new Stage(name, appointmentDate);
     }
 
     public void Cleared()

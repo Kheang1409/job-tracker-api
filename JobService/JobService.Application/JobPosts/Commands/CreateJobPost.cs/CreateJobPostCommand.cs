@@ -1,3 +1,4 @@
+using JobTracker.JobService.Application.Commons;
 using MediatR;
 
 namespace JobTracker.JobService.Application.JobLocations.Commands.CreateJobPost;
@@ -12,7 +13,7 @@ public record CreateJobPostCommand(
     int MinSalary,
     int MaxSalary,
     string Currency ,
-    List<CreateSkill> RequiredSkills,
+    List<CommandSkill> RequiredSkills,
     string JobDescription,
     string Country,
     string Street,
@@ -21,7 +22,3 @@ public record CreateJobPostCommand(
     int PostalCode,
     DateTime ExpirationDate
 ) : IRequest<string>;
-
-public record CreateSkill(
-    string Name
-);

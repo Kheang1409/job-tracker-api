@@ -32,7 +32,7 @@ public class CandidateDetailDto
     public class StageDto
     {
         public string  Name { get; private set; } = string.Empty;
-        public DateTime AppointmentDate  { get; private set; }
+        public DateTime? AppointmentDate { get; private set; } = null;
         public string Remarked { get; private set; } = string.Empty;
         public string Status { get; private set; } = string.Empty;
 

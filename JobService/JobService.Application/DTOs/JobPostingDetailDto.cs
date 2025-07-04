@@ -36,7 +36,7 @@ public class JobPostingDetailDto
             NumberOfOpenings = jobPosting.NumberOfOpenings,
             MinExperience = jobPosting.MinExperience,
             Salary = jobPosting.SalaryRange is not null ? (SalaryRangeDto)jobPosting.SalaryRange : null,
-            RequirementSkills = jobPosting.RequiredSkills.Select(s => (SkillDto)s),
+            RequirementSkills = jobPosting.RequiredSkills.Select(skill => (SkillDto)skill),
             JobDescription = jobPosting.JobDescription,
             JobLocation = jobPosting.JobLocation,
             Candidates = jobPosting.Candidates.Select(candidate => (CandidateDto)candidate).ToList(),

@@ -19,7 +19,9 @@ public class WithdrawCommandHandler : IRequestHandler<WithdrawCommand, bool>
     
     public async Task<bool> Handle(WithdrawCommand command, CancellationToken cancellationToken)
     {
-        var candidate = await _candidateRepository.GetByIdAsync(command.JobPostId, command.CandidateId);
+        var job = await _jobPostRepository.GetByIdAsync(command.JobPostId);
+        var candidate = job.Candidates.Single(
+            candidate => candidate.Status == Domain.Enums.ApplicationStatus.Applied && candidate.CandidateId == command.CandidateId);
         candidate.Withdraw();
         return await _candidateRepository.UpdateAsync(command.JobPostId, command.CandidateId, candidate);
     }

@@ -18,11 +18,15 @@ public class CandidateRepository : ICandidateRepository
         _jobPosts = database.GetCollection<JobPosting>("JobPostings");
     }
 
-    public async Task<Candidate> GetByIdAsync(string JobPostId, string CandidateId)
+    public async Task<Candidate> GetByIdAsync(string AuthorId, string JobPostId, string CandidateId)
     {
-        var filter = Builders<JobPosting>.Filter.Eq(j => j.Id, JobPostId);
+        var filter = Builders<JobPosting>.Filter.And(
+            Builders<JobPosting>.Filter.Eq(j => j.Id, JobPostId),
+            Builders<JobPosting>.Filter.Eq(j => j.AuthorId, AuthorId)
+        );
+
         var projection = Builders<JobPosting>.Projection
-            .ElemMatch(j => j.Candidates, c => c.CandidateId == CandidateId && c.Status == ApplicationStatus.Applied)
+            .ElemMatch(j => j.Candidates, c => c.CandidateId == CandidateId && c.Status != ApplicationStatus.Withdrawn)
             .Exclude("_id");
 
         var result = await _jobPosts.Find(filter)
@@ -31,21 +35,30 @@ public class CandidateRepository : ICandidateRepository
 
         if (result == null || result.Candidates == null || !result.Candidates.Any())
             throw new NotFoundException("Candidate not found");
+
         return result.Candidates.First();
     }
 
-    public async Task<IEnumerable<Candidate>> GetAllAsync(string JobPostId, int PageNumber, int Limit)
+    public async Task<IEnumerable<Candidate>> GetAllAsync(string AuthorId, string JobPostId, int PageNumber, int Limit)
     {
-        var JobPostingFilter = Builders<JobPosting>.Filter.Eq(j => j.Id, JobPostId);
+        var filter = Builders<JobPosting>.Filter.And(
+            Builders<JobPosting>.Filter.Eq(j => j.Id, JobPostId),
+            Builders<JobPosting>.Filter.Eq(j => j.AuthorId, AuthorId)
+        );
+
         var projection = Builders<JobPosting>.Projection
-            .ElemMatch(j => j.Candidates, c => c.Status == ApplicationStatus.Applied)
+            .Include(j => j.Candidates)
             .Exclude("_id");
 
-        var JobPosting = await _jobPosts.Find(JobPostingFilter)
+        var result = await _jobPosts.Find(filter)
             .Project<JobPostingProjection>(projection)
             .FirstOrDefaultAsync();
 
-        return JobPosting?.Candidates ?? Enumerable.Empty<Candidate>();
+        return result?.Candidates?
+            .Where(c => c.Status != ApplicationStatus.Withdrawn)
+            .Skip((PageNumber - 1) * Limit)
+            .Take(Limit)
+            ?? Enumerable.Empty<Candidate>();
     }
     public async Task<string> AddAsync(string JobPostId, Candidate Candidate)
     {

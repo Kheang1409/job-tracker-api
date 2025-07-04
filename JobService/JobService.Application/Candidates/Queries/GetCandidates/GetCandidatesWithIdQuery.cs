@@ -3,4 +3,4 @@ using MediatR;
 
 namespace JobTracker.JobService.Application.Candidates.Queries.GetCandidates;
 
-public record GetCandidatesWithIdQuery(string JobPostId, int PageNumber, int Limit) : IRequest<IEnumerable<Candidate>>;
+public record GetCandidatesWithIdQuery(string AuthorId, string JobPostId, int PageNumber, int Limit) : IRequest<IEnumerable<Candidate>>;

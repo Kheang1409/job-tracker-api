@@ -5,7 +5,6 @@ using JobTracker.JobService.Application.JobLocations.Commands.CreateJobPost;
 using JobTracker.JobService.Application.JobLocations.Queries.GetJobPosts;
 using JobTracker.JobService.Application.JobLocations.Queries.GetJobPost;
 using JobTracker.JobService.Application.DTOs;
-using JobTracker.JobService.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -67,7 +66,7 @@ public class JobController : ControllerBase
             command.MinSalary,
             command.MaxSalary,
             command.Currency,
-            command.RequiredSkills.Select(s => Skill.Create(s.Name)).ToList(),
+            command.RequiredSkills,
             command.JobDescription,
             command.Street,
             command.City,
@@ -98,7 +97,7 @@ public class JobController : ControllerBase
             command.MinSalary,
             command.MaxSalary,
             command.Currency,
-            command.RequiredSkills.Select(s => Skill.Create(s.Name)).ToList(),
+            command.RequiredSkills,
             command.JobDescription,
             command.Street,
             command.City,

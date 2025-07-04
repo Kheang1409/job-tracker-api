@@ -1,5 +1,5 @@
 using JobTracker.JobService.Application.Repositories;
-using JobTracker.JobService.Domain.Commons;
+using JobTracker.JobService.Domain.Entities;
 using MediatR;
 
 namespace JobTracker.JobService.Application.JobLocations.Commands.UpdateJobPost;
@@ -29,7 +29,7 @@ public class UpdateJobPostCommandHandler : IRequestHandler<UpdateJobPostWithIdCo
             command.MinSalary,
             command.MaxSalary,
             command.Currency,
-            command.RequiredSkills,
+            command.RequiredSkills.Select(s => Skill.Create(s.Name)).ToList(),
             command.JobDescription,
             command.Street,
             command.City,

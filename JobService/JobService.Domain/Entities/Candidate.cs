@@ -26,7 +26,7 @@ public class Candidate
         FirstName = firstName;
         LastName = lastName;
         Email = email;
-        Rounds.Add(Stage.Create("Resume Review"));
+        Rounds.Add(Stage.Create("Resume Review", null));
         AppliedAt = DateTime.UtcNow;
     }
 
@@ -55,6 +55,8 @@ public class Candidate
 
     public void Selected()
     {
+        Rounds.Last().Cleared();
+        Rounds.Add(Stage.Create("Selected", null));
         Rounds.Last().Cleared();
         Status = ApplicationStatus.Selected;
     }

@@ -26,11 +26,12 @@ public class CandidateController : ControllerBase
         _mediator = mediator;
     }
 
-    [AllowAnonymous]
     [HttpGet]
     public async Task<IActionResult> GetCandidateById(string jobId, [FromQuery] GetCandidatesQuery query)
     {
+        var authorId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new UnauthorizedAccessException();
         var queryId = new GetCandidatesWithIdQuery(
+            authorId,
             jobId,
             query.PageNumber,
             query.Limit
@@ -39,11 +40,11 @@ public class CandidateController : ControllerBase
         return Ok(candidates.Select(c => (CandidateDto)c));
     }
 
-    [AllowAnonymous]
     [HttpGet("{candidateId}")]
     public async Task<IActionResult> GetCandidateById(string jobId, string candidateId)
     {
-        var candidate = await _mediator.Send(new GetCandidateQuery(jobId, candidateId));
+        var authorId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new UnauthorizedAccessException();
+        var candidate = await _mediator.Send(new GetCandidateQuery(authorId, jobId, candidateId));
         return Ok((CandidateDetailDto)candidate);
     }
 

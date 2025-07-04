@@ -1,5 +1,5 @@
 using JobTracker.JobService.Application.Repositories;
-using JobTracker.JobService.Domain.Enums;
+using JobTracker.JobService.Domain.Entities;
 using JobTracker.JobService.Domain.Factories;
 using MediatR;
 
@@ -32,7 +32,7 @@ public class CreateJobPostCommandHandler : IRequestHandler<CreateJobPostWithIdCo
             command.MinSalary,
             command.MaxSalary,
             command.Currency,
-            command.RequiredSkills,
+            command.RequiredSkills.Select(s => Skill.Create(s.Name)).ToList(),
             command.JobDescription,
             command.Street,
             command.City,

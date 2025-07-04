@@ -1,4 +1,4 @@
-using JobTracker.JobService.Domain.Entities;
+using JobTracker.JobService.Application.Commons;
 using MediatR;
 
 namespace JobTracker.JobService.Application.JobLocations.Commands.CreateJobPost;
@@ -14,7 +14,7 @@ public record CreateJobPostWithIdCommand(
     int MinSalary,
     int MaxSalary,
     string Currency,
-    List<Skill> RequiredSkills,
+    List<CommandSkill> RequiredSkills,
     string JobDescription,
     string Country,
     string Street,

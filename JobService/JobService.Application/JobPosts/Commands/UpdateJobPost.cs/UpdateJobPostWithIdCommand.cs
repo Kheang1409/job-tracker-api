@@ -1,4 +1,4 @@
-using JobTracker.JobService.Domain.Entities;
+using JobTracker.JobService.Application.Commons;
 using MediatR;
 
 namespace JobTracker.JobService.Application.JobLocations.Commands.UpdateJobPost;
@@ -15,7 +15,7 @@ public record UpdateJobPostWithIdCommand(
     int MinSalary,
     int MaxSalary,
     string Currency ,
-    List<Skill> RequiredSkills,
+    List<CommandSkill> RequiredSkills,
     string JobDescription,
     string Country,
     string Street,
