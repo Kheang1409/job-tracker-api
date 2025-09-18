@@ -1,18 +1,17 @@
 using JobTracker.UserService.Domain.Entities;
 using JobTracker.UserService.Domain.Factories;
-using JobTracker.UserService.Domain.Enums;
 
 namespace JobTracker.UserService.Infrastructure.Factories;
 
 public class UserFactory : IUserFactory
 {
-    public User CreateNormalUser(string firstName, string lastName, string email, string password)
+    public User Create(string firstName, string lastName, string email, string password)
     {
-        return User.Create(firstName, lastName, email, password, UserRole.Normal_User);
+        return new User.Builder()
+                .SetFirstName(firstName)
+                .SetLastName(lastName)
+                .SetEmail(email)
+                .SetPassword(password)
+                .Build();
     }
-    public User CreateAdminUser(string firstName, string lastName, string email, string password)
-    {
-        return User.Create(firstName, lastName, email, password, UserRole.Admin);
-    }
-     
 }

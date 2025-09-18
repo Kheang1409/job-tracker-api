@@ -26,8 +26,6 @@ public class UserController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Register([FromBody] CreateUserCommand command)
     {
-        if (command == null)
-            return BadRequest("Invalid input data.");
         var userId = await _mediator.Send(command);
         return CreatedAtAction(nameof(Profile), new { id = userId }, command);
     }
@@ -50,17 +48,13 @@ public class UserController : ControllerBase
             userId,
             command.FirstName,
             command.LastName,
-            command.Bio,
-            command.Gender,
             command.Email,
-            command.CountryCode,
-            command.PhoneNumber,
-            command.Country,
-            command.Street,
-            command.City,
-            command.State,
-            command.PostalCode,
-            command.Skills
+            command.ContactNumber,
+            command.Bio,
+            command.Skills,
+            command.Experiences,
+            command.Projects,
+            command.Address
         );
         await _mediator.Send(commandWithId);
         return NoContent();

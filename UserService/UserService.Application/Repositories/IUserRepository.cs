@@ -1,6 +1,7 @@
 using JobTracker.UserService.Domain.Entities;
 
 namespace JobTracker.UserService.Application.Repositories;
+
 public interface IUserRepository
 {
     Task<User> GetByIdAsync(string Id);

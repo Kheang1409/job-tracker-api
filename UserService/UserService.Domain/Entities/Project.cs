@@ -1,38 +1,66 @@
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
-
 namespace JobTracker.UserService.Domain.Entities;
 
 public class Project
 {
-    [BsonId]
-    [BsonRepresentation(BsonType.ObjectId)]
-    public string Id { get; private set; } = string.Empty;
     public string Name { get; private set; } = string.Empty;
     public string About { get; private set; } = string.Empty;
-    public DateTime StartDate { get; private set; }
-    public DateTime EndDate { get; private set; }
+    public DateTime? During  { get; private set; }
+    public string Link { get; private set; } = string.Empty;
 
-    public Project() { }
-
-    private Project(string name, string about, DateTime startDate, DateTime endDate)
+    private Project(Builder builder)
     {
-        Id = ObjectId.GenerateNewId().ToString();
-        Name = name;
-        About = about;
-        StartDate = startDate;
-        EndDate = endDate;
+        Name = builder.Name;
+        About = builder.About;
+        During = builder.During;
+        Link = builder.Link;
     }
 
-    public static Project Create(string name, string about, DateTime startDate, DateTime endDate)
+    public class Builder
     {
-        return new Project(name, about, startDate, endDate);
+        public string Name { get; private set; } = string.Empty;
+        public string About { get; private set; } = string.Empty;
+        public DateTime? During { get; private set; }
+        public string Link { get; private set; } = string.Empty;
+
+        public Builder SetName(string name)
+        {
+            Name = name;
+            return this;
+        }
+
+        public Builder SetAbout(string about)
+        {
+            About = about;
+            return this;
+        }
+
+        public Builder SetDuring(DateTime during)
+        {
+            During = during;
+            return this;
+        }
+
+
+        public Builder SetLink(string link)
+        {
+            Link = link;
+            return this;
+        }
+
+        public Project Build()
+        {
+            if (string.IsNullOrEmpty(Name))
+                throw new ArgumentNullException(nameof(Name), "Name cannot be null or empty.");
+            if (During is null)
+                throw new ArgumentNullException(nameof(During), "During cannot be null or empty.");
+            return new Project(this);
+        }
     }
-    public void Update(string name, string about, DateTime startDate, DateTime endDate)
+    public void UpdateProject(string name, string about, DateTime during, string link)
     {
         Name = name;
         About = about;
-        StartDate = startDate;
-        EndDate = endDate;
+        During = during;
+        Link = link;
     }
 }

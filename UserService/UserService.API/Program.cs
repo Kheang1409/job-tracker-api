@@ -1,8 +1,7 @@
-using JobTracker.UserService.Api.Middleware;
+using JobTracker.SharedKernel.Middleware;
 using JobTracker.UserService.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
-
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

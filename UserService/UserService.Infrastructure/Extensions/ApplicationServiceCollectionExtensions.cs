@@ -8,13 +8,6 @@ using JobTracker.UserService.Application.Users.Commands.UpdateUser;
 using JobTracker.UserService.Application.Users.Queries.GetUsers;
 using JobTracker.UserService.Application.Users.Queries.GetUserProfile;
 
-
-using JobTracker.UserService.Application.Projects.Commands.CreateProject;
-using JobTracker.UserService.Application.Projects.Commands.DeleteProject;
-using JobTracker.UserService.Application.Projects.Commands.UpdateProject;
-using JobTracker.UserService.Application.Projects.Queries.GetProjects;
-using JobTracker.UserService.Application.Projects.Queries.GetProject;
-
 using JobTracker.UserService.Application.Services;
 
 
@@ -46,13 +39,6 @@ public static class ApplicationServiceCollectionExtensions
 
             cfg.RegisterServicesFromAssemblyContaining<GetUserProfileQuery>();
             cfg.RegisterServicesFromAssemblyContaining<GetUsersQuery>();
-
-            //Project
-            cfg.RegisterServicesFromAssemblyContaining<CreateProjectCommand>();
-            cfg.RegisterServicesFromAssemblyContaining<CreateProjectWithIdCommand>(); 
-            cfg.RegisterServicesFromAssemblyContaining<UpdateProjectCommand>();
-            cfg.RegisterServicesFromAssemblyContaining<UpdateProjectWithIdCommand>();
-            cfg.RegisterServicesFromAssemblyContaining<DeleteProjectCommand>();
         });
 
         //Users
@@ -66,12 +52,6 @@ public static class ApplicationServiceCollectionExtensions
         services.AddValidatorsFromAssemblyContaining<LoginCommandValidator>();
         services.AddValidatorsFromAssemblyContaining<ForgotPasswordCommandValidator>();
         services.AddValidatorsFromAssemblyContaining<ResetPasswordCommandValidator>();
-
-        // Project
-        services.AddValidatorsFromAssemblyContaining<CreateProjectCommandValidator>();
-        services.AddValidatorsFromAssemblyContaining<DeleteProjectCommandValidator>();
-        services.AddValidatorsFromAssemblyContaining<GetProjectQueryValidator>();
-        services.AddValidatorsFromAssemblyContaining<GetProjectsQueryValidator>();
 
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
         services.AddScoped<IJwtService, JwtService>();

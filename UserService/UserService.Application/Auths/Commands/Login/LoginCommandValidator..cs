@@ -1,4 +1,5 @@
 using FluentValidation;
+
 namespace JobTracker.UserService.Application.Auths.Commands.Login;
 
 public class LoginCommandValidator : AbstractValidator<LoginCommand>

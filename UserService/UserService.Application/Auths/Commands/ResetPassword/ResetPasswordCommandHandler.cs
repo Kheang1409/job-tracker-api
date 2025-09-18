@@ -1,6 +1,5 @@
 using JobTracker.UserService.Application.Repositories;
 using MediatR;
-using MongoDB.Bson;
 
 namespace JobTracker.UserService.Application.Auths.Commands.ResetPassword;
 

@@ -1,3 +1,4 @@
+using JobTracker.SharedKernel.Exceptions;
 using JobTracker.UserService.Application.Repositories;
 using JobTracker.UserService.Application.Services;
 using MediatR;
@@ -20,12 +21,12 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, string>
     
     public async Task<string> Handle(LoginCommand command, CancellationToken cancellationToken)
     {
-        var existingUser = await _userRepository.GetByEmailAsync(command.Email);
-        if(existingUser is null)
-            throw new UnauthorizedAccessException($"Invalid email or password.");
-        if (!existingUser.Verify(command.Password))
+        var user = await _userRepository.GetByEmailAsync(command.Email);
+        if(user is null)
+            throw new NotFoundException($"Invalid email or password.");
+        if (!user.Verify(command.Password))
             throw new UnauthorizedAccessException("Invalid email or password.");
-        var token = await _jwtService.GenerateToken(existingUser);
+        var token = await _jwtService.GenerateToken(user);
         return token;
     }
 }

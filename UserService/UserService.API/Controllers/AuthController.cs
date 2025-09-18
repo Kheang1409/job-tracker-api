@@ -23,9 +23,6 @@ public class AuthController : ControllerBase
     [HttpPost("forgot-password")]
     public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordCommand command)
     {
-
-        if (command == null)
-            return BadRequest("Invalid input data.");
         var token =  await _mediator.Send(command);
         return Ok(new { Token = token });
     }
@@ -33,8 +30,6 @@ public class AuthController : ControllerBase
     [HttpPost("reset-password")]
     public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordCommand command)
     {
-        if (command == null)
-            return BadRequest("Invalid input data.");
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new UnauthorizedAccessException();
         var commandWithId = new ResetPasswordWithIdCommand(
             userId,
@@ -48,8 +43,6 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginCommand command)
     {
-        if (command == null)
-            return BadRequest("Invalid input data.");
         var token = await _mediator.Send(command);
         return Ok(new { Token = token });
     }
