@@ -1,4 +1,4 @@
-using JobTracker.UserService.Domain.Entities;
+using JobTracker.UserService.Application.Users.Commands.UpdateUser.Commons;
 using MediatR;
 
 namespace JobTracker.UserService.Application.Users.Commands.UpdateUser;
@@ -10,9 +10,9 @@ public record UpdateUserCommand(
     string Email,
     string ContactNumber,
     List<string> Skills,
-    List<Experience> Experiences,
-    List<Project> Projects,
-    Address Address
+    List<ExperienceCommand> Experiences,
+    List<ProjectCommand> Projects,
+    AddressCommand Address
 ) : IRequest<bool>;
 
 
