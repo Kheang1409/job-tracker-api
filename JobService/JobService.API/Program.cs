@@ -1,5 +1,5 @@
-using JobTracker.JobService.Api.Middleware;
 using JobTracker.JobService.Infrastructure.Persistence;
+using JobTracker.SharedKernel.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 

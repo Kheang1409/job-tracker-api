@@ -1,42 +1,76 @@
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
-
 namespace JobTracker.JobService.Domain.Entities;
 
 public class Address
 {
-    [BsonId]
-    [BsonRepresentation(BsonType.ObjectId)]
-    public string Id { get; private set; } = string.Empty;
     public string Country { get; private set; } = string.Empty;
     public string Street { get; private set; } = string.Empty;
     public string City { get; private set; } = string.Empty;
     public string State { get; private set; } = string.Empty;
     public int PostalCode { get; private set; }
 
-    public Address() { }
-
-    private Address(string country, string street, string city, string state, int postalCode)
+    private Address(Builder builder)
     {
-        Id = ObjectId.GenerateNewId().ToString();
-        Country = country;
-        Street = street;
-        City = city;
-        State = state;
-        PostalCode = postalCode;
+        Country = builder.Country;
+        Street = builder.Street;
+        City = builder.City;
+        State = builder.State;
+        PostalCode = builder.PostalCode;
     }
 
-    public static Address Create(string country, string street, string city, string state, int postalCode)
+    public class Builder
     {
-        return new Address(country, street, city, state, postalCode);
-    }
+        public string Country { get; private set; } = string.Empty;
+        public string State { get; private set; } = string.Empty;
+        public string City { get; private set; } = string.Empty;
+        public string Street { get; private set; } = string.Empty;
+        public int PostalCode { get; private set; }
 
-    public void Update(string country, string street, string city, string state, int postalCode)
+        public Builder SetCountry(string country)
+        {
+            Country = country;
+            return this;
+        }
+
+        public Builder SetState(string state)
+        {
+            State = state;
+            return this;
+        }
+
+        public Builder SetCity(string city)
+        {
+            City = city;
+            return this;
+        }
+
+
+        public Builder SetStreet(string street)
+        {
+            Street = street;
+            return this;
+        }
+
+        public Builder SetPostalCode(int postalCode)
+        {
+            PostalCode = postalCode;
+            return this;
+        }
+
+        public Address Build()
+        {
+            if (string.IsNullOrEmpty(Country))
+                throw new ArgumentNullException(nameof(Country), "Country cannot be null or empty.");
+            if (PostalCode == 0)
+                throw new ArgumentNullException(nameof(PostalCode), "PostalCode cannot be null or empty.");
+            return new Address(this);
+        }
+    }
+    public void UpdateAddress(string country, string state, string city, string street, int postalCode)
     {
         Country = country;
-        Street = street;
-        City = city;
         State = state;
+        City = city;
+        Street = street;
         PostalCode = postalCode;
     }
 }

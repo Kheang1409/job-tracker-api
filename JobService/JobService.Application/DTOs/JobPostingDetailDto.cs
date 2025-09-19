@@ -2,7 +2,7 @@ using JobTracker.JobService.Domain.Entities;
 
 namespace JobTracker.JobService.Application.DTOs;
 
-public class JobPostingDetailDto
+public class PostDetailDto
 {
     public string Id { get; private set; } = string.Empty;
     public string AuthorId { get; private set; } = string.Empty;
@@ -11,52 +11,42 @@ public class JobPostingDetailDto
     public string WorkMode { get; private set; } = string.Empty;
     public string EmploymentType { get; private set; } = string.Empty;
     public int NumberOfOpenings { get; private set; } = 1;
-    public int MinExperience { get; private set; } = 0;
-    public SalaryRangeDto? Salary { get; private set; }
-    public IEnumerable<SkillDto>? RequirementSkills { get; private set; }
-    public string JobDescription { get; private set; } = string.Empty;
-    public Address? JobLocation { get; private set; }
-    public List<CandidateDto> Candidates { get; private set; } = new();
+    public int MinExperience { get; private set; }
+    public int MaxExperience { get; private set; }
+    public decimal MinSalary { get; private set; }
+    public decimal MaxSalary { get; private set; }
+    public string Currency { get; private set; } = string.Empty;
+    public IEnumerable<string>? Skills { get; private set; }
+    public string Description { get; private set; } = string.Empty;
+    public Address? Address { get; private set; }
     public string Status { get; private set; } = string.Empty;
     public DateTime CreatedAt { get; private set; }
     public DateTime UpdatedAt { get; private set; }
-    public DateTime ExpirationDate { get; private set; }
+    public DateTime? ExpirationDate { get; private set; }
 
 
-    public static explicit operator JobPostingDetailDto(JobPosting jobPosting)
+    public static explicit operator PostDetailDto(Post post)
     {
-        return new JobPostingDetailDto
+        return new PostDetailDto
         {
-            Id = jobPosting.Id,
-            AuthorId = jobPosting.AuthorId,
-            Title = jobPosting.Title,
-            CompanyName = jobPosting.CompanyName,
-            WorkMode = jobPosting.WorkMode.ToString(),
-            EmploymentType = jobPosting.EmploymentType.ToString(),
-            NumberOfOpenings = jobPosting.NumberOfOpenings,
-            MinExperience = jobPosting.MinExperience,
-            Salary = jobPosting.SalaryRange is not null ? (SalaryRangeDto)jobPosting.SalaryRange : null,
-            RequirementSkills = jobPosting.RequiredSkills.Select(skill => (SkillDto)skill),
-            JobDescription = jobPosting.JobDescription,
-            JobLocation = jobPosting.JobLocation,
-            Candidates = jobPosting.Candidates.Select(candidate => (CandidateDto)candidate).ToList(),
-            Status = jobPosting.Status.ToString(),
-            CreatedAt = jobPosting.CreatedAt,
-            UpdatedAt = jobPosting.UpdatedAt,
-            ExpirationDate = jobPosting.ExpirationDate
+            Id = post.Id,
+            AuthorId = post.AuthorId,
+            Title = post.Title,
+            CompanyName = post.CompanyName,
+            WorkMode = post.WorkMode.ToString(),
+            EmploymentType = post.EmploymentType.ToString(),
+            NumberOfOpenings = post.NumberOfOpenings,
+            MinExperience = post.MinExperience,
+            MaxExperience = post.MaxExperience,
+            MinSalary = post.MinSalary,
+            MaxSalary = post.MaxSalary,
+            Currency = post.Currency,
+            Skills = post.Skills,
+            Description = post.Description,
+            Address = post.Address,
+            Status = post.Status.ToString(),
+            CreatedAt = post.CreatedAt,
+            ExpirationDate = post.ExpirationDate
         };
-    }
-
-    public class SkillDto
-    {
-        public string Name { get; private set; } = string.Empty;
-
-        public static explicit operator SkillDto(Skill skill)
-        {
-            return new SkillDto
-            {
-                Name = skill.Name
-            };
-        }
     }
 }

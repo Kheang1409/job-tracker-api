@@ -2,38 +2,44 @@ using JobTracker.JobService.Domain.Entities;
 
 namespace JobTracker.JobService.Application.DTOs;
 
-public class JobPostingDto
+public class PostDto
 {
     public string Id { get; private set; } = string.Empty;
     public string Title { get; private set; } = string.Empty;
     public string CompanyName { get; private set; } = string.Empty;
     public string WorkMode { get; private set; } = string.Empty;
     public string EmploymentType { get; private set; } = string.Empty;
-    public SalaryRangeDto? Salary { get; private set; }
+    public int NumberOfOpenings { get; private set; }
+    public int MinExperience { get; private set; }
+    public int MaxExperience { get; private set; }
+    public decimal MinSalary { get; private set; }
+    public decimal MaxSalary { get; private set; }
+    public string Currency { get; private set; } = string.Empty;
     public Address? JobLocation { get; private set; }
-    public int NumberOfOpenings { get; private set; } = 1;
     public string Status { get; private set; } = string.Empty;
     public DateTime CreatedAt { get; private set; }
-    public DateTime UpdatedAt { get; private set; }
-    public DateTime ExpirationDate { get; private set; }
+    public DateTime? ExpirationDate { get; private set; }
 
 
-    public static explicit operator JobPostingDto(JobPosting jobPosting)
+    public static explicit operator PostDto(Post post)
     {
-        return new JobPostingDto
+        return new PostDto
         {
-            Id = jobPosting.Id,
-            Title = jobPosting.Title,
-            CompanyName = jobPosting.CompanyName,
-            WorkMode = jobPosting.WorkMode.ToString(),
-            EmploymentType = jobPosting.EmploymentType.ToString(),
-            Salary = jobPosting.SalaryRange is not null ? (SalaryRangeDto)jobPosting.SalaryRange : null,
-            JobLocation = jobPosting.JobLocation,
-            NumberOfOpenings = jobPosting.NumberOfOpenings,
-            Status = jobPosting.Status.ToString(),
-            CreatedAt = jobPosting.CreatedAt,
-            UpdatedAt = jobPosting.UpdatedAt,
-            ExpirationDate = jobPosting.ExpirationDate
+            Id = post.Id,
+            Title = post.Title,
+            CompanyName = post.CompanyName,
+            WorkMode = post.WorkMode.ToString(),
+            EmploymentType = post.EmploymentType.ToString(),
+            NumberOfOpenings = post.NumberOfOpenings,
+            MinExperience = post.MinExperience,
+            MaxExperience = post.MaxExperience,
+            MinSalary = post.MinSalary,
+            MaxSalary = post.MaxSalary,
+            Currency = post.Currency,
+            JobLocation = post.Address,
+            Status = post.Status.ToString(),
+            CreatedAt = post.CreatedAt,
+            ExpirationDate = post.ExpirationDate
         };
     }
 }

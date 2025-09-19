@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using JobTracker.JobService.Infrastructure.Extensions;
+using JobTracker.SharedKernel.Extensions;
 
 namespace JobTracker.JobService.Infrastructure.Persistence;
 
@@ -10,7 +11,7 @@ public static class ServiceCollectionExtensions
     {
         services
             .AddJwtAuthentication(configuration)
-            .AddSwaggerDocumentation()
+            .AddSwaggerDocumentation("Job API")
             .AddMongoDb(configuration)
             .AddMessaging()
             .AddApplicationServices();

@@ -1,15 +1,15 @@
-using JobTracker.JobService.Application.JobLocations.Commands.DeleteJobPost;
-using JobTracker.JobService.Application.JobLocations.Commands.UpdateStatusJobPost;
-using JobTracker.JobService.Application.JobLocations.Commands.UpdateJobPost;
-using JobTracker.JobService.Application.JobLocations.Commands.CreateJobPost;
-using JobTracker.JobService.Application.JobLocations.Queries.GetJobPosts;
-using JobTracker.JobService.Application.JobLocations.Queries.GetJobPost;
+using JobTracker.JobService.Application.JobLocations.Commands.DeletePost;
+using JobTracker.JobService.Application.JobLocations.Commands.UpdatePostStatus;
+using JobTracker.JobService.Application.JobLocations.Commands.UpdatePost;
+using JobTracker.JobService.Application.JobLocations.Commands.CreatePost;
+using JobTracker.JobService.Application.JobLocations.Queries.GetPosts;
+using JobTracker.JobService.Application.JobLocations.Queries.GetPost;
+using JobTracker.JobService.Application.JobLocations.Queries.GetPostCount;
 using JobTracker.JobService.Application.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using MediatR;
-using JobTracker.JobService.Application.JobLocations.Queries.GetJobCount;
 
 namespace JobService.Controllers;
 
@@ -25,37 +25,50 @@ public class JobController : ControllerBase
         _mediator = mediator;
     }
 
-    [AllowAnonymous]
     [HttpGet("total")]
-    public async Task<IActionResult> GetJobs([FromQuery] GetJobCountQuery query)
-    {
-        var count = await _mediator.Send(query);
+    public async Task<IActionResult> GetPosts([FromQuery] GetPostCountQuery query)
+    {   
+        var ownerId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new UnauthorizedAccessException();
+        var queryWithId = new GetPostCountQueryWithId(
+            query.Title,
+            query.CompanyName,
+            ownerId,
+            query.PageNumber,
+            query.Limit
+        );
+        var count = await _mediator.Send(queryWithId);
         return Ok(count);
     }
 
-    [AllowAnonymous]
     [HttpGet]
-    public async Task<IActionResult> GetJobs([FromQuery] GetJobPostsQuery query)
+    public async Task<IActionResult> GetPosts([FromQuery] GetPostsQuery query)
     {
-        var jobPostings = await _mediator.Send(query);
-        return Ok(jobPostings.Select(j => (JobPostingDto)j));
+        var ownerId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new UnauthorizedAccessException();
+        var queryWithId = new GetPostsQueryWithId(
+            query.Title,
+            query.CompanyName,
+            ownerId,
+            query.PageNumber,
+            query.Limit
+        );
+        var posts = await _mediator.Send(queryWithId);
+        return Ok(posts.Select(j => (PostDto)j));
     }
 
-    [AllowAnonymous]
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetJobById(string id)
+    public async Task<IActionResult> GetPostById(string id)
     {
-        var jobPosting = await _mediator.Send(new GetJobPostQuery(id));
-        return Ok((JobPostingDetailDto)jobPosting);
+        var post = await _mediator.Send(new GetPostQuery(id));
+        return Ok((PostDetailDto)post);
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateJob([FromBody] CreateJobPostCommand command)
+    public async Task<IActionResult> CreatePost([FromBody] CreatePostCommand command)
     {
         if (command == null)
             return BadRequest("Invalid input data.");
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new UnauthorizedAccessException();
-        var commandWithId = new CreateJobPostWithIdCommand(
+        var commandWithId = new CreatePostWithIdCommand(
             userId,
             command.Title,
             command.CompanyName,
@@ -63,29 +76,26 @@ public class JobController : ControllerBase
             command.EmploymentType,
             command.NumberOfOpenings,
             command.MinExperience,
+            command.MaxExperience,
             command.MinSalary,
             command.MaxSalary,
             command.Currency,
-            command.RequiredSkills,
-            command.JobDescription,
-            command.Street,
-            command.City,
-            command.State,
-            command.Country,
-            command.PostalCode,
+            command.Skills,
+            command.Description,
+            command.Address,
             command.ExpirationDate
         );
-        var jobPostId = await _mediator.Send(commandWithId);
-        return CreatedAtAction(nameof(GetJobById), new { id = jobPostId }, commandWithId);
+        var postId = await _mediator.Send(commandWithId);
+        return CreatedAtAction(nameof(GetPostById), new { id = postId }, commandWithId);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateJob(string id, [FromBody] UpdateJobPostCommand command)
+    public async Task<IActionResult> UpdatePost(string id, [FromBody] UpdatePostCommand command)
     {
         if (command == null)
             return BadRequest("Invalid input data.");
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new UnauthorizedAccessException();
-        var commandWithId = new UpdateJobPostWithIdCommand(
+        var commandWithId = new UpdatePostWithIdCommand(
             userId,
             id,
             command.Title,
@@ -94,27 +104,25 @@ public class JobController : ControllerBase
             command.EmploymentType,
             command.NumberOfOpenings,
             command.MinExperience,
+            command.MaxExperience,
             command.MinSalary,
             command.MaxSalary,
             command.Currency,
-            command.RequiredSkills,
-            command.JobDescription,
-            command.Street,
-            command.City,
-            command.State,
-            command.Country,
-            command.PostalCode,
-            command.ExpirationDate
+            command.Skills,
+            command.Description,
+            command.Address,
+            command.ExpirationDate,
+            command.Status
         );
         await _mediator.Send(commandWithId);
         return NoContent();
     }
 
     [HttpPut("{id}/status")]
-    public async Task<IActionResult> UpdateStatusJobPost(string id, [FromBody] UpdateStatusJobPostCommand command)
+    public async Task<IActionResult> UpdatePostStatus(string id, [FromBody] UpdateStatusPostCommand command)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new UnauthorizedAccessException();
-        var commandId = new UpdateStatusJobPostWithIdCommand(
+        var commandId = new UpdatePostStatusWithIdCommand(
             userId,
             id,
             command.Status
@@ -128,7 +136,7 @@ public class JobController : ControllerBase
     public async Task<IActionResult> DeleteJob(string id)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new UnauthorizedAccessException();
-        await _mediator.Send(new DeleteJobPostCommand(userId, id));
+        await _mediator.Send(new DeletePostCommand(userId, id));
         return NoContent();
     }
 }

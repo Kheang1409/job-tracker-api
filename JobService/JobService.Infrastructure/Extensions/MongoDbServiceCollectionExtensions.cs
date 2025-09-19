@@ -30,9 +30,8 @@ public static class MongoDbServiceCollectionExtensions
         });
 
         // Repositories and Factories
-        services.AddScoped<IJobPostRepository, JobPostRepository>();
-        services.AddScoped<ICandidateRepository, CandidateRepository>();
-        services.AddScoped<IJobPostFactory, JobPostFactory>();
+        services.AddScoped<IPostRepository, JobRepository>();
+        services.AddScoped<IPostFactory, PostFactory>();
 
         return services;
     }
