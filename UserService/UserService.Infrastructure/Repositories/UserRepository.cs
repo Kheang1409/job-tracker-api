@@ -1,6 +1,7 @@
 using JobTracker.SharedKernel.Exceptions;
 using JobTracker.UserService.Application.Repositories;
 using JobTracker.UserService.Domain.Entities;
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace JobTracker.UserService.Infrastructure.Repositories;
@@ -19,6 +20,39 @@ public class UserRepository : IUserRepository
         _users.Indexes.CreateOne(new CreateIndexModel<User>(indexKeys, indexOptions));
     }
 
+    public async Task<int> GetUserCountAsync(
+        string Fullname,
+        string Skill
+    )
+    {
+        var filterBuilder = Builders<User>.Filter;
+        var filters = new List<FilterDefinition<User>>();
+
+        if (!string.IsNullOrWhiteSpace(Fullname))
+        {
+            var nameParts = Fullname.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+            if (nameParts.Length > 0)
+            {
+                filters.Add(filterBuilder.Regex(u => u.FirstName, new BsonRegularExpression(nameParts[0], "i")));
+            }
+
+            if (nameParts.Length > 1)
+            {
+                filters.Add(filterBuilder.Regex(u => u.LastName, new BsonRegularExpression(nameParts[1], "i")));
+            }
+        }
+
+        if (!string.IsNullOrWhiteSpace(Skill))
+        {
+            filters.Add(filterBuilder.Regex(u => u.Skills, new BsonRegularExpression(Skill, "i")));
+        }
+
+        var combinedFilter = filters.Count > 0 ? filterBuilder.And(filters) : FilterDefinition<User>.Empty;
+        var count = await _users.CountDocumentsAsync(combinedFilter);
+        return (int)count;
+    }
+
     public async Task<IEnumerable<User>> GetAllAsync(string Fullname, string Skill, int PageNumber, int Limit)
     {
         var filterBuilder = Builders<User>.Filter;
@@ -30,18 +64,18 @@ public class UserRepository : IUserRepository
 
             if (nameParts.Length > 0)
             {
-                filters.Add(filterBuilder.Regex(u => u.FirstName, new MongoDB.Bson.BsonRegularExpression(nameParts[0], "i")));
+                filters.Add(filterBuilder.Regex(u => u.FirstName, new BsonRegularExpression(nameParts[0], "i")));
             }
 
             if (nameParts.Length > 1)
             {
-                filters.Add(filterBuilder.Regex(u => u.LastName, new MongoDB.Bson.BsonRegularExpression(nameParts[1], "i")));
+                filters.Add(filterBuilder.Regex(u => u.LastName, new BsonRegularExpression(nameParts[1], "i")));
             }
         }
 
         if (!string.IsNullOrWhiteSpace(Skill))
         {
-            filters.Add(filterBuilder.Regex(u => u.Skills, new MongoDB.Bson.BsonRegularExpression(Skill, "i")));
+            filters.Add(filterBuilder.Regex(u => u.Skills, new BsonRegularExpression(Skill, "i")));
         }
 
         var combinedFilter = filters.Count > 0 ? filterBuilder.And(filters) : FilterDefinition<User>.Empty;

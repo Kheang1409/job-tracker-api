@@ -12,9 +12,10 @@ public static class ServiceCollectionExtensions
         services
             .AddJwtAuthentication(configuration)
             .AddSwaggerDocumentation("User API")
+            .AddApplicationServices()
             .AddMongoDb(configuration)
             .AddMessaging()
-            .AddApplicationServices();
+            .AddCronJob();
 
         return services;
     }
