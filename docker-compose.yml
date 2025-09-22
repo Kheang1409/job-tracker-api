@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   zookeeper:
@@ -41,8 +41,6 @@ services:
       dockerfile: UserService/Dockerfile
     env_file:
       - .env
-    ports:
-      - "5001:8080"
     environment:
       - CONNECTION_STRINGS=${CONNECTION_STRINGS}
       - MONGODB_DATABASE_NAME=${MONGODB_DATABASE_NAME}
@@ -51,6 +49,8 @@ services:
       - JWT_AUDIENCE=${JWT_AUDIENCE}
       - JWT_EXPIRY_MINUTES=${JWT_EXPIRY_MINUTES}
       - KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BOOTSTRAP_SERVERS}
+      - QUOTE_ENDPOINT=${QUOTE_ENDPOINT}
+      - QUOTE_API_KEY=${QUOTE_API_KEY}
     networks:
       - app-network
     depends_on:
@@ -62,8 +62,6 @@ services:
       dockerfile: JobService/Dockerfile
     env_file:
       - .env
-    ports:
-      - "5002:8080"
     environment:
       - CONNECTION_STRINGS=${CONNECTION_STRINGS}
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}
