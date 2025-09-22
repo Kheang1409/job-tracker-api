@@ -9,17 +9,14 @@ namespace JobTracker.NotificationService.Infrastructure.Messaging;
 
 public class KafkaConsumer : BackgroundService
 {
-    private readonly IServiceProvider _serviceProvider;
     private readonly IEmailService _emailService;
     private readonly IConsumer<string, string> _consumer;
 
     public KafkaConsumer(
-        IServiceProvider serviceProvider,
         IEmailService emailService,
         IConfiguration configuration
         )
     {
-        _serviceProvider = serviceProvider;
         _emailService = emailService;
         var kafkaConfig = new ConsumerConfig
         {
@@ -51,14 +48,9 @@ public class KafkaConsumer : BackgroundService
                     {
                         if (payload.Type.ToString() == "Auth")
                             await HandleResetPassword(payload);
-                        if (payload.Type.ToString() == "Applied")
-                            await HandleApplied(payload);
-                        if (payload.Type.ToString() == "Move On")
-                            await HandleMoveOn(payload);
-                        if (payload.Type.ToString() == "Rejected")
-                            await HandleRejected(payload);
-                        if (payload.Type.ToString() == "Selected")
-                            await HandleSelected(payload);
+                        if (payload.Type.ToString() == "Quote")
+                            await HandleQuote(payload);
+
                     }
                 }
             }
@@ -67,8 +59,6 @@ public class KafkaConsumer : BackgroundService
         {
             throw;
         }
-        
-        
     }
 
     private async Task HandleResetPassword(dynamic payload)
@@ -86,74 +76,20 @@ public class KafkaConsumer : BackgroundService
         await _emailService.Send(notification);
     }
 
-    private async Task HandleApplied(dynamic payload)
+    private async Task HandleQuote(dynamic payload)
     {
         var recipient = payload.Email?.ToString();
         var firstName = payload.FirstName?.ToString();
-        var title = payload.Title?.ToString();
-        var companyName = payload.CompanyName?.ToString();
-        var notification = Applied.Create(
+        var quote = payload.Quote?.ToString();
+        var author = payload.Author?.ToString();
+        var category = payload.Category?.ToString();
+        var notification = QuoteResponse.Create(
             recipient,
-            $"Application Received for {title} at {companyName}",
+            $"JobTracker Motivation - {DateTime.UtcNow.ToShortDateString()}",
             firstName,
-            title,
-            companyName
-        );
-
-        await _emailService.Send(notification);
-    }
-
-    private async Task HandleMoveOn(dynamic payload)
-    {
-        Console.WriteLine(payload);
-        var recipient = payload.Email?.ToString();
-        var firstName = payload.FirstName?.ToString();
-        var title = payload.Title?.ToString();
-        var companyName = payload.CompanyName?.ToString();
-        var stage = payload.Stage?.ToString();
-        DateTime appointmentDate = payload.AppointmentDate?.Value;
-        var notification = MoveOn.Create(
-            recipient,
-            $"Great News! You're Moving Ahead at {companyName}",
-            firstName,
-            title,
-            companyName,
-            stage,
-            appointmentDate
-        );
-
-        await _emailService.Send(notification);
-    }
-
-    private async Task HandleRejected(dynamic payload)
-    {
-        var recipient = payload.Email?.ToString();
-        var firstName = payload.FirstName?.ToString();
-        var title = payload.Title?.ToString();
-        var companyName = payload.CompanyName?.ToString();
-        var notification = Rejected.Create(
-            recipient,
-            $"Update on Your Application for {title} at {companyName}",
-            firstName,
-            title,
-            companyName
-        );
-
-        await _emailService.Send(notification);
-    }
-
-    private async Task HandleSelected(dynamic payload)
-    {
-        var recipient = payload.Email?.ToString();
-        var firstName = payload.FirstName?.ToString();
-        var title = payload.Title?.ToString();
-        var companyName = payload.CompanyName?.ToString();
-        var notification = Selected.Create(
-            recipient,
-            $"You're Selected for the {title} Position at {companyName}!", //title
-            firstName,
-            title,
-            companyName
+            quote,
+            author,
+            category
         );
 
         await _emailService.Send(notification);
