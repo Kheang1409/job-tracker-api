@@ -4,5 +4,5 @@ namespace JobTracker.UserService.Domain.Factories;
 
 public interface IUserFactory
 {
-    User Create(string firstName, string lastName, string email, string password);
+    User Create(string username, string firstName, string lastName, string email, string password);
 }

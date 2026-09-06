@@ -1,45 +1,29 @@
-using JobTracker.SharedKernel.Messaging;
 using JobTracker.UserService.Application.Repositories;
 using JobTracker.UserService.Application.Services;
 using MediatR;
 
 namespace JobTracker.UserService.Application.Auths.Commands.ForgotPassword;
 
-public class ForgotPasswordCommandHandler : IRequestHandler<ForgotPasswordCommand, string>
+public class ForgotPasswordCommandHandler : IRequestHandler<ForgotPasswordCommand, bool>
 {
     private readonly IUserRepository _userRepository;
-    private readonly IJwtService _jwtService;
-    private readonly IKafkaProducer _kafkaProducer;
 
     public ForgotPasswordCommandHandler(
-        IUserRepository userRepository,
-        IJwtService jwtService,
-        IKafkaProducer kafkaProducer
+        IUserRepository userRepository
     )
     {
         _userRepository = userRepository;
-        _jwtService = jwtService;
-        _kafkaProducer = kafkaProducer;
     }
     
-    public async Task<string> Handle(ForgotPasswordCommand command, CancellationToken cancellationToken)
+    public async Task<bool> Handle(ForgotPasswordCommand command, CancellationToken cancellationToken)
     {
         var user = await _userRepository.GetByEmailAsync(command.Email);
-        if(user is null)
-            throw new InvalidOperationException($"A user with the email '{command.Email}' no exists.");
-        user.ForgotPassword();
-        var notificationPayload = new
-            {
-                Type = "Auth",
-                user.FirstName,
-                user.Email,
-                user.OTP
-            };
-        await Task.WhenAll(
-            _userRepository.UpdateAsync(user),
-            _kafkaProducer.Produce("job-tracker-topic", Guid.NewGuid().ToString(), notificationPayload)
-        );
-        var token = await _jwtService.GenerateToken(user);
-        return token;
+        // Do not reveal whether an account exists.
+        if (user is null)
+            return true;
+        var otp = user.ForgotPassword();
+        var email = EmailOutboxMessage.PasswordReset(user.Email, user.FirstName, otp);
+        await _userRepository.UpdateWithEmailAsync(user, email, cancellationToken);
+        return true;
     }
 }

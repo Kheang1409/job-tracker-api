@@ -16,6 +16,7 @@ using Microsoft.Extensions.DependencyInjection;
 using FluentValidation;
 using MediatR;
 using JobTracker.SharedKernel.Behaviors;
+using JobTracker.UserService.Application.JobApplications;
 
 namespace JobTracker.UserService.Infrastructure.Extensions;
 
@@ -39,6 +40,7 @@ public static class ApplicationServiceCollectionExtensions
 
             cfg.RegisterServicesFromAssemblyContaining<GetUserProfileQuery>();
             cfg.RegisterServicesFromAssemblyContaining<GetUsersQuery>();
+            cfg.RegisterServicesFromAssemblyContaining<GetJobApplicationsQuery>();
         });
 
         //Users
@@ -47,6 +49,7 @@ public static class ApplicationServiceCollectionExtensions
         services.AddValidatorsFromAssemblyContaining<DeleteUserCommandValidator>();
         services.AddValidatorsFromAssemblyContaining<GetUserProfileQueryValidator>();
         services.AddValidatorsFromAssemblyContaining<GetUsersQueryValidator>();
+        services.AddValidatorsFromAssemblyContaining<CreateJobApplicationValidator>();
 
         //Auth
         services.AddValidatorsFromAssemblyContaining<LoginCommandValidator>();

@@ -3,21 +3,25 @@ using JobTracker.UserService.Application.Repositories;
 using JobTracker.UserService.Domain.Entities;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using System.Text.RegularExpressions;
+using JobTracker.UserService.Application.Services;
+using JobTracker.UserService.Infrastructure.Services;
 
 namespace JobTracker.UserService.Infrastructure.Repositories;
 
 public class UserRepository : IUserRepository
 {
     private readonly IMongoCollection<User> _users;
+    private readonly IMongoCollection<EmailOutboxMessage> _emailOutbox;
+    private readonly IMongoClient _client;
+    private readonly EmailOutboxProtector _outboxProtector;
 
-    public UserRepository(IMongoClient mongoClient)
+    public UserRepository(IMongoDatabase database, EmailOutboxProtector outboxProtector)
     {
-        var database = mongoClient.GetDatabase("JobTrackerApp");
         _users = database.GetCollection<User>("Users");
-
-        var indexKeys = Builders<User>.IndexKeys.Ascending(u => u.Email);
-        var indexOptions = new CreateIndexOptions { Unique = true };
-        _users.Indexes.CreateOne(new CreateIndexModel<User>(indexKeys, indexOptions));
+        _emailOutbox = database.GetCollection<EmailOutboxMessage>("EmailOutbox");
+        _client = database.Client;
+        _outboxProtector = outboxProtector;
     }
 
     public async Task<int> GetUserCountAsync(
@@ -34,18 +38,20 @@ public class UserRepository : IUserRepository
 
             if (nameParts.Length > 0)
             {
-                filters.Add(filterBuilder.Regex(u => u.FirstName, new BsonRegularExpression(nameParts[0], "i")));
+                filters.Add(filterBuilder.Regex(u => u.FirstName, CaseInsensitiveLiteral(nameParts[0])));
             }
 
             if (nameParts.Length > 1)
             {
-                filters.Add(filterBuilder.Regex(u => u.LastName, new BsonRegularExpression(nameParts[1], "i")));
+                filters.Add(filterBuilder.Regex(u => u.LastName, CaseInsensitiveLiteral(nameParts[1])));
             }
         }
 
         if (!string.IsNullOrWhiteSpace(Skill))
         {
-            filters.Add(filterBuilder.Regex(u => u.Skills, new BsonRegularExpression(Skill, "i")));
+            filters.Add(filterBuilder.Regex(
+                new StringFieldDefinition<User>("Skills"),
+                CaseInsensitiveLiteral(Skill)));
         }
 
         var combinedFilter = filters.Count > 0 ? filterBuilder.And(filters) : FilterDefinition<User>.Empty;
@@ -64,18 +70,20 @@ public class UserRepository : IUserRepository
 
             if (nameParts.Length > 0)
             {
-                filters.Add(filterBuilder.Regex(u => u.FirstName, new BsonRegularExpression(nameParts[0], "i")));
+                filters.Add(filterBuilder.Regex(u => u.FirstName, CaseInsensitiveLiteral(nameParts[0])));
             }
 
             if (nameParts.Length > 1)
             {
-                filters.Add(filterBuilder.Regex(u => u.LastName, new BsonRegularExpression(nameParts[1], "i")));
+                filters.Add(filterBuilder.Regex(u => u.LastName, CaseInsensitiveLiteral(nameParts[1])));
             }
         }
 
         if (!string.IsNullOrWhiteSpace(Skill))
         {
-            filters.Add(filterBuilder.Regex(u => u.Skills, new BsonRegularExpression(Skill, "i")));
+            filters.Add(filterBuilder.Regex(
+                new StringFieldDefinition<User>("Skills"),
+                CaseInsensitiveLiteral(Skill)));
         }
 
         var combinedFilter = filters.Count > 0 ? filterBuilder.And(filters) : FilterDefinition<User>.Empty;
@@ -97,13 +105,39 @@ public class UserRepository : IUserRepository
         return user;
     }
 
-    public async Task<User> GetByEmailAsync(string Email) =>
-        await _users.Find(u => u.Email == Email).SingleOrDefaultAsync();
+    public async Task<User?> GetByEmailAsync(string email) =>
+        await _users.Find(u => u.Email == email.Trim().ToLowerInvariant()).SingleOrDefaultAsync();
+
+    public async Task<User?> GetByUsernameAsync(string username) =>
+        await _users.Find(u => u.Username == username.Trim()).SingleOrDefaultAsync();
 
     public async Task<string> AddAsync(User user) 
     {
         await _users.InsertOneAsync(user);
         return user.Id;
+    }
+
+    public async Task<string> AddWithEmailAsync(
+        User user,
+        EmailOutboxMessage email,
+        CancellationToken cancellationToken)
+    {
+        _outboxProtector.Protect(email);
+        using var session = await _client.StartSessionAsync(cancellationToken: cancellationToken);
+        session.StartTransaction();
+        try
+        {
+            await _users.InsertOneAsync(session, user, cancellationToken: cancellationToken);
+            await _emailOutbox.InsertOneAsync(session, email, cancellationToken: cancellationToken);
+            await session.CommitTransactionAsync(cancellationToken);
+            return user.Id;
+        }
+        catch
+        {
+            if (session.IsInTransaction)
+                await session.AbortTransactionAsync(CancellationToken.None);
+            throw;
+        }
     }
 
 
@@ -115,9 +149,38 @@ public class UserRepository : IUserRepository
         return true;
     }
 
+    public async Task<bool> UpdateWithEmailAsync(
+        User user,
+        EmailOutboxMessage email,
+        CancellationToken cancellationToken)
+    {
+        _outboxProtector.Protect(email);
+        using var session = await _client.StartSessionAsync(cancellationToken: cancellationToken);
+        session.StartTransaction();
+        try
+        {
+            var result = await _users.ReplaceOneAsync(
+                session, existing => existing.Id == user.Id, user, cancellationToken: cancellationToken);
+            if (result.MatchedCount == 0)
+                throw new NotFoundException($"User with Id '{user.Id}' not found.");
+            await _emailOutbox.InsertOneAsync(session, email, cancellationToken: cancellationToken);
+            await session.CommitTransactionAsync(cancellationToken);
+            return true;
+        }
+        catch
+        {
+            if (session.IsInTransaction)
+                await session.AbortTransactionAsync(CancellationToken.None);
+            throw;
+        }
+    }
+
     public async Task<bool> DeleteAsync(string Id)
     {
         var deletedUser = await _users.FindOneAndDeleteAsync(u => u.Id == Id);
         return deletedUser != null;
     }
+
+    private static BsonRegularExpression CaseInsensitiveLiteral(string value) =>
+        new(Regex.Escape(value.Trim()), "i");
 }

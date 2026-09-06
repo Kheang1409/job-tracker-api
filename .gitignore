@@ -1,75 +1,28 @@
-# .NET Core build artifacts
-bin/
-obj/
-*.dll
-*.exe
-*.pdb
-*.app
-*.log
-*.db
-*.db-shm
-*.db-wal
+# .NET build artifacts
+**/bin/
+**/obj/
+**/TestResults/
+**/coverage/
 
-# Visual Studio files
-.vs/
-*.suo
-*.user
-*.userosscache
-*.sln.docstates
-*.cache
-*.log
-*.ncb
-*.sdf
-*.opensdf
-*.VC.db
+# IDE files
+**/.vs/
+**/.idea/
+**/*.user
+**/*.suo
+**/*.sln.iml
 
-# Build results and debug files
-*.Build.cs
-*.bak
-*.tmp
-*.log
-
-# Rider / JetBrains files
-.idea/
-*.sln.iml
-
-# Test results
-TestResults/
-*.coverage
-*.coveragexml
-*.testsettings
-*.vsmdi
-*.psess
-*.vsp
-*.vspx
-*.sap
-
-# Docker
-docker-compose.override.yml
-*.dockerfile
-Dockerfile.*
-
-# ASP.NET User Secrets & Environment Configs
+# Local configuration and secrets
+.env
+.env.*
 **/appsettings.Development.json
 **/secrets.json
 **/local.settings.json
-.env
-.env.*
 
-# Logs
-logs/
-*.log
+# Logs and packages
+**/*.log
+**/*.nupkg
+**/*.snupkg
 
-# Others
-*.nupkg
-*.snupkg
-*.swp
-*.DS_Store
+# Operating-system files
+.DS_Store
 Thumbs.db
-
-# Backup files
-*~
-*.orig
-
-# Ignore .env files
-.env

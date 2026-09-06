@@ -12,11 +12,13 @@ namespace JobTracker.SharedKernel.Middleware
         public ExceptionHandlerContext(IHostEnvironment env)
         {
             var validation = new ValidationExceptionHandler();
+            var badRequest = new BadRequestExceptionHandler();
             var unauthorized = new UnauthorizedAccessExceptionHandler();
             var notFound = new NotFoundExceptionHandler();
             var fallback = new DefaultExceptionHandler();
 
             validation
+                .SetNext(badRequest)
                 .SetNext(unauthorized)
                 .SetNext(notFound)
                 .SetNext(fallback);

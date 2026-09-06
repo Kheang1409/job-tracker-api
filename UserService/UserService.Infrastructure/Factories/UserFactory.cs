@@ -5,9 +5,10 @@ namespace JobTracker.UserService.Infrastructure.Factories;
 
 public class UserFactory : IUserFactory
 {
-    public User Create(string firstName, string lastName, string email, string password)
+    public User Create(string username, string firstName, string lastName, string email, string password)
     {
         return new User.Builder()
+                .SetUsername(username)
                 .SetFirstName(firstName)
                 .SetLastName(lastName)
                 .SetEmail(email)

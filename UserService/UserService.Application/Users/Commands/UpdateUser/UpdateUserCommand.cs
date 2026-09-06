@@ -9,10 +9,10 @@ public record UpdateUserCommand(
     string Bio,
     string Email,
     string ContactNumber,
+    string ContactCountry,
     List<string> Skills,
     List<ExperienceCommand> Experiences,
     List<ProjectCommand> Projects,
     AddressCommand Address
 ) : IRequest<bool>;
-
 

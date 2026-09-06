@@ -9,6 +9,7 @@ public record UpdateUserWithIdCommand(
     string LastName,
     string Email,
     string ContactNumber,
+    string ContactCountry,
     string Bio,
     List<string> Skills,
     List<ExperienceCommand> Experiences,

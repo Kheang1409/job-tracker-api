@@ -5,7 +5,7 @@ namespace JobTracker.SharedKernel.Middleware.Handlers
 {
     public abstract class ExceptionHandlerBase : IExceptionHandler
     {
-        private IExceptionHandler _next;
+        private IExceptionHandler? _next;
 
         public IExceptionHandler SetNext(IExceptionHandler handler)
         {

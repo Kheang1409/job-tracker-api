@@ -3,7 +3,7 @@ using MediatR;
 
 namespace JobTracker.UserService.Application.Auths.Commands.ResetPassword;
 
-public class ResetPasswordCommandHandler : IRequestHandler<ResetPasswordWithIdCommand, bool>
+public class ResetPasswordCommandHandler : IRequestHandler<ResetPasswordCommand, bool>
 {
     private readonly IUserRepository _userRepository;
 
@@ -13,11 +13,16 @@ public class ResetPasswordCommandHandler : IRequestHandler<ResetPasswordWithIdCo
         _userRepository = userRepository;
     }
     
-    public async Task<bool> Handle(ResetPasswordWithIdCommand command, CancellationToken cancellationToken)
+    public async Task<bool> Handle(ResetPasswordCommand command, CancellationToken cancellationToken)
     {
-        var user = await _userRepository.GetByIdAsync(command.userId);
-        if (user is null || string.IsNullOrEmpty(user?.OTP))
-            throw new InvalidOperationException($"The provided OTP '{command.OTP}' is invalid or has expired.");
+        var user = await _userRepository.GetByEmailAsync(command.Email);
+        if (user is null)
+            throw new InvalidOperationException("The password reset code is invalid or has expired.");
+        if (!user.TryConsumePasswordResetOtp(command.OTP))
+        {
+            await _userRepository.UpdateAsync(user);
+            throw new InvalidOperationException("The password reset code is invalid or has expired.");
+        }
         user.ResetPassword(command.Password);
         await _userRepository.UpdateAsync(user);
         return true;

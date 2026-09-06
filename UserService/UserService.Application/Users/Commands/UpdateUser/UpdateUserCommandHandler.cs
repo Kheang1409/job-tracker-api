@@ -1,5 +1,6 @@
 using JobTracker.UserService.Application.Repositories;
 using JobTracker.UserService.Domain.Entities;
+using JobTracker.SharedKernel.Domain;
 using MediatR;
 
 namespace JobTracker.UserService.Application.Users.Commands.UpdateUser;
@@ -29,7 +30,7 @@ public class UpdateUserCommandHandler : IRequestHandler<UpdateUserWithIdCommand,
         var experiences = command.Experiences.Select(
                         experience => new Experience.Builder()
                         .SetCompanyName(experience.CompanyName)
-                        .SetPosition(experience.CompanyName)
+                        .SetPosition(experience.Position)
                         .SetBulletPoints(experience.BulletPoints)
                         .SetStartDate(experience.StartDate)
                         .SetEndDate(experience.EndDate)
@@ -50,6 +51,7 @@ public class UpdateUserCommandHandler : IRequestHandler<UpdateUserWithIdCommand,
             command.LastName,
             command.Email,
             command.ContactNumber,
+            command.ContactCountry,
             command.Bio,
             command.Skills,
             experiences,
@@ -57,6 +59,7 @@ public class UpdateUserCommandHandler : IRequestHandler<UpdateUserWithIdCommand,
             address
         );
         
-        return await _userRepository.UpdateAsync(user);
+        var updated = await _userRepository.UpdateAsync(user);
+        return updated;
     }
 }

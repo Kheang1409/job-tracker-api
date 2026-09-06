@@ -7,10 +7,13 @@ public class ResetPasswordCommandValidator : AbstractValidator<ResetPasswordComm
     public ResetPasswordCommandValidator()
     {
         RuleFor(x => x.OTP)
-            .NotEmpty().WithMessage("OPT is required.")
-            .MinimumLength(6).WithMessage("OTP must be 6 characters.")
-            .MaximumLength(6).WithMessage("OTP must be 6 characters.")
-            .Matches(@"[0-9]").WithMessage("OPT must be numbers.");
+            .NotEmpty().WithMessage("OTP is required.")
+            .Length(6).WithMessage("OTP must be 6 characters.")
+            .Matches(@"^\d{6}$").WithMessage("OTP must contain only numbers.");
+
+        RuleFor(x => x.Email)
+            .NotEmpty().WithMessage("Email is required.")
+            .EmailAddress().WithMessage("Email must be valid.");
 
         RuleFor(x => x.Password)
             .NotEmpty().WithMessage("Password is required.")

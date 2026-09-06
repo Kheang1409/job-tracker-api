@@ -22,10 +22,17 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, string>
     public async Task<string> Handle(LoginCommand command, CancellationToken cancellationToken)
     {
         var user = await _userRepository.GetByEmailAsync(command.Email);
-        if(user is null)
-            throw new NotFoundException($"Invalid email or password.");
+        if (user is null)
+            throw new UnauthorizedAccessException("Invalid email or password.");
         if (!user.Verify(command.Password))
             throw new UnauthorizedAccessException("Invalid email or password.");
+        if (!user.IsEmailVerified)
+            throw new UnauthorizedAccessException("Please verify your email before signing in.");
+        if (user.NeedsPasswordRehash)
+        {
+            user.RehashPassword(command.Password);
+            await _userRepository.UpdateAsync(user);
+        }
         var token = await _jwtService.GenerateToken(user);
         return token;
     }

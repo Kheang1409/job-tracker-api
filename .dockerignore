@@ -1,0 +1,13 @@
+.git
+.vscode
+**/bin
+**/obj
+**/TestResults
+**/coverage
+**/*.user
+**/*.suo
+**/.vs
+**/.idea
+**/*.log
+**/.env
+**/.env.*

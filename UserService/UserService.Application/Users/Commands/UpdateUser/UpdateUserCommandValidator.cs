@@ -8,10 +8,10 @@ public class UpdateUserCommandValidator : AbstractValidator<UpdateUserCommand>
     {
         RuleFor(x => x.FirstName)
             .NotEmpty().WithMessage("Firstname is required.")
-            .Length(2).WithMessage("Firstname must be valid.");
+            .Length(2, 100).WithMessage("Firstname must be between 2 and 100 characters.");
         RuleFor(x => x.LastName)
             .NotEmpty().WithMessage("Lastname is required.")
-            .Length(2).WithMessage($"Lastname must be valid.");
+            .Length(2, 100).WithMessage("Lastname must be between 2 and 100 characters.");
         RuleFor(x => x.Email)
             .NotEmpty().WithMessage("Email is required.")
             .EmailAddress().WithMessage("Email must be valid.");
@@ -19,5 +19,7 @@ public class UpdateUserCommandValidator : AbstractValidator<UpdateUserCommand>
             .NotEmpty().WithMessage("Phone Number is required.")
             .Matches(@"^\+\d{1,3}\d{7,15}$")
             .WithMessage("Phone Number must start with a '+' followed by country code and 7 to 15 digits.");
+        RuleFor(x => x.ContactCountry)
+            .NotEmpty().WithMessage("Phone country is required.");
     }
 }
