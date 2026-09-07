@@ -1,17 +1,11 @@
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
-
-# Copy csproj files and restore dependencies
-COPY UserService/UserService.csproj ./UserService/
+COPY JobApplicationService/JobApplicationService.csproj ./JobApplicationService/
 COPY SharedKernel/SharedKernel.csproj ./SharedKernel/
-
-RUN dotnet restore ./UserService/UserService.csproj
-
-# Copy full source and build
+RUN dotnet restore ./JobApplicationService/JobApplicationService.csproj
 COPY . .
-RUN dotnet publish ./UserService/UserService.csproj -c Release -o /app/publish --no-restore
+RUN dotnet publish ./JobApplicationService/JobApplicationService.csproj -c Release -o /app/publish --no-restore
 
-# Runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:10.0
 WORKDIR /app
 RUN apt-get update \
@@ -19,6 +13,5 @@ RUN apt-get update \
     && update-ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 COPY --from=build /app/publish .
-
 EXPOSE 8080
-ENTRYPOINT ["dotnet", "UserService.dll"]
+ENTRYPOINT ["dotnet", "JobApplicationService.dll"]

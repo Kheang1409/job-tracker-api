@@ -13,6 +13,6 @@
     <PackageReference Include="coverlet.collector" Version="10.0.1" PrivateAssets="all" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="../../UserService/UserService.csproj" />
+    <ProjectReference Include="../../JobApplicationService/JobApplicationService.csproj" />
   </ItemGroup>
 </Project>

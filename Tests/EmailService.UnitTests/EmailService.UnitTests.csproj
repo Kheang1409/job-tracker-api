@@ -13,6 +13,6 @@
     <PackageReference Include="coverlet.collector" Version="10.0.1" PrivateAssets="all" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="../../EmailService/EmailService.Worker/EmailService.Worker.csproj" />
+    <ProjectReference Include="../../EmailService/EmailService.csproj" />
   </ItemGroup>
 </Project>

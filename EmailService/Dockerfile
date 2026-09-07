@@ -1,9 +1,9 @@
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
-COPY EmailService/EmailService.Worker/EmailService.Worker.csproj EmailService/EmailService.Worker/
-RUN dotnet restore EmailService/EmailService.Worker/EmailService.Worker.csproj
+COPY EmailService/EmailService.csproj EmailService/
+RUN dotnet restore EmailService/EmailService.csproj
 COPY . .
-RUN dotnet publish EmailService/EmailService.Worker/EmailService.Worker.csproj -c Release -o /app/publish --no-restore
+RUN dotnet publish EmailService/EmailService.csproj -c Release -o /app/publish --no-restore
 FROM mcr.microsoft.com/dotnet/runtime:10.0
 WORKDIR /app
 RUN apt-get update \
@@ -11,4 +11,4 @@ RUN apt-get update \
     && update-ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 COPY --from=build /app/publish .
-ENTRYPOINT ["dotnet", "EmailService.Worker.dll"]
+ENTRYPOINT ["dotnet", "EmailService.dll"]

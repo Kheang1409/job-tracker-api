@@ -1,21 +1,20 @@
 # JobTracker backend
 
-The backend for JobTracker, a personal job-application tracker. It provides a
-.NET 10 user API plus a worker-only email service. It does not publish jobs,
-manage candidates, or expose an email HTTP API.
+The backend for JobTracker, a personal job-application tracker. It provides
+separate .NET 10 user and job-application APIs behind an API gateway, plus a
+worker-only email service.
 
 ## Architecture
 
-- `UserService.API` provides registration, email verification, login, password recovery, profile management, job-application CRUD, SignalR updates, and health checks.
-- `UserService.Application` contains MediatR commands, queries, validators, and contracts.
-- `UserService.Domain` contains the user and job-application domain models.
-- `UserService.Infrastructure` provides MongoDB persistence, JWT creation, Kafka publishing, indexes, and the transactional email outbox.
-- `EmailService.Worker` consumes `email-notifications` and sends branded email through SMTP.
-- `SharedKernel` contains validation, authentication, CORS, health, and exception handling.
+- `ApiGateway` is the browser-facing Ocelot gateway and routes requests to the owning service.
+- `UserService` owns registration, email verification, login, password recovery, profiles, and the transactional email outbox.
+- `JobApplicationService` owns authenticated job-application CRUD, its MongoDB data, and SignalR updates.
+- `EmailService` is a worker-only project that consumes `email-notifications` and sends branded email through SMTP.
+- `SharedKernel` contains shared domain primitives, validation, authentication, CORS, health, and exception handling.
 - `Tests` covers domain behavior, validation, Mongo mappings, outbox encryption, and email templates.
 
-The previous Ocelot gateway, Job Service, and Notification Service were removed.
-The root workspace Nginx proxy is now the browser-facing API entry point.
+The frontend Nginx server forwards `/api` traffic to `ApiGateway`; downstream
+services are not browser-facing.
 
 ## Reliability and security
 

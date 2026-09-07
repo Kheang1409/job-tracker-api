@@ -1,0 +1,42 @@
+{
+  "Routes": [
+    {
+      "UpstreamPathTemplate": "/api/job-applications-hub/{everything}",
+      "DownstreamPathTemplate": "/api/job-applications-hub/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [{ "Host": "job-application-service", "Port": 8080 }],
+      "Priority": 100
+    },
+    {
+      "UpstreamPathTemplate": "/api/job-applications-hub",
+      "DownstreamPathTemplate": "/api/job-applications-hub",
+      "DownstreamScheme": "ws",
+      "DownstreamHostAndPorts": [{ "Host": "job-application-service", "Port": 8080 }],
+      "Priority": 100
+    },
+    {
+      "UpstreamPathTemplate": "/api/job-applications/{everything}",
+      "DownstreamPathTemplate": "/api/job-applications/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [{ "Host": "job-application-service", "Port": 8080 }],
+      "Priority": 100
+    },
+    {
+      "UpstreamPathTemplate": "/api/job-applications",
+      "DownstreamPathTemplate": "/api/job-applications",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [{ "Host": "job-application-service", "Port": 8080 }],
+      "Priority": 100
+    },
+    {
+      "UpstreamPathTemplate": "/api/{everything}",
+      "DownstreamPathTemplate": "/api/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [{ "Host": "user-service", "Port": 8080 }],
+      "Priority": 0
+    }
+  ],
+  "GlobalConfiguration": {
+    "BaseUrl": "http://localhost:8080"
+  }
+}
